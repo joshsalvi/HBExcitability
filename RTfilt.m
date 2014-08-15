@@ -1,4 +1,4 @@
-function [uptimes downtimes] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol)
+function [uptimes downtimes] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
 % Residence Time Calculations
 % This function defines the residence times for a signal by first finding
 % the moving average, then applies a high-pass filter at an input
@@ -20,19 +20,22 @@ function [uptimes downtimes] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,a
 %  out  :    saved output file with all of the parameters
 %  mintime : minimum time allowed for residence times
 %  altsol  : run an alternative solution? (1=yes, 0=no)
+%  figures : display figures? (1=yes, 0=no)
 %
-%      out not required if sopt==0; mintime not required
+%      out not required if sopt==0; figures,mintime not required,
 %
 %     RTfilt('/dir/sine.mat',1,1,3,800,1,'/dir/sineout.mat');
 %
 
 warning off;
-display('Importing...');
+%display('Importing...');
 
 %load('/Users/joshsalvi/Downloads/4.mat');
 %load('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat');
 %load('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat');
+if isempty(dir) == 0
 load(dir);
+end
 
 %Fs = 10e3;                          % Choose the sampling frequency (note that this won't work properly for simulation data)
 % Select operating points
@@ -63,10 +66,12 @@ ind = Fi;
 Xvec = Xd(:,ind);
 clear Xd;
 %}
-display('Moving average and standard deviation...');
+%display('Moving average and standard deviation...');
 time = linspace(0,length(Xvec)/Fs,length(Xvec));    % time in seconds
 
-figure(1); subplot(4,1,1); plot(time,Xvec); title(sprintf('%s%s %s%s','F= ',num2str(F_rand(Np,Nt)),' k= ',num2str(k_rand(Np,Nt))));ylabel('displacement')
+if figures==1
+figure(1); subplot(4,1,1); plot(time,Xvec); title(sprintf('%s%s %s%s','F= ',num2str(F_rand(Np,Nt)),' k= ',num2str(k_rand(Np,Nt))));ylabel('%displacement')
+end
 % Moving window, running average using filter
 win = win1*Fs;                                        % CHOOSE WINDOW, must be ODD
 filtfreq2 = freq1;                                 % CHOOSE FILTER WINDOW FOR HIGH-PASS FILTERING (in Hz)
@@ -76,10 +81,12 @@ movingavgX = filter(ones(1,win)/win,1,Xvec);
 Xvecfilt = medfilt1(Xvec,win2);
 Xvecfilt_detrended = Xvecfilt - movingavgX;
 
+if figures==1
 subplot(4,1,2); plot(time,movingavgX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
 movingstdX = movingstd(Xvec,win,'central');
 subplot(4,1,3); plot(time,movingstdX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
 subplot(4,1,4); plot(time,Xvecfilt_detrended); ylabel('filtered time signal'); title('filtered and detrended signal');
+end
 
 % Find up and down positiosn
 Mup = zeros(1,length(Xvecfilt_detrended));          % initialize variables
@@ -158,7 +165,7 @@ else if isempty(nbinsdown) ==1 | isnan(nbinsdown)
     end
 end
 
-disp('Running statistics...');
+%disp('Running statistics...');
 % Run statistics
 [RTupexp_h, RTupexp_p] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p] = lillietest(uptimes);
@@ -169,11 +176,13 @@ disp('Running statistics...');
 [RTupgauss_h, RTupgauss_p(3)] = jbtest(uptimes);
 [RTdowngauss_h, RTdowngauss_p(3)] = jbtest(downtimes);
 
+if figures==1
 figure;
 subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_p,RTupgauss_p(1),RTupgauss_p(2),RTupgauss_p(3),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_p,RTdowngauss_p(1),RTdowngauss_p(2),RTdowngauss_p(3),num2str(down_events)));
+end
 
 if isempty(mintime) == 0
 uptimes(uptimes<mintime) = [];
@@ -192,28 +201,33 @@ if length(uptimes) >=4 & length(downtimes)>=4
 [RTupgauss_h, RTupgauss_p(3)] = jbtest(uptimes);
 [RTdowngauss_h, RTdowngauss_p(3)] = jbtest(downtimes);
 
+if figures==1
 figure;
 subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_p,RTupgauss_p(1),RTupgauss_p(2),RTupgauss_p(3),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_p,RTdowngauss_p(1),RTdowngauss_p(2),RTdowngauss_p(3),num2str(down_events)));
+end
+
 else
-    disp('Minimum number of observations not met for statistical test');
+    %disp('Minimum number of observations not met for statistical test');
 end
 end
 
 % Alternative way to solve the problem
 if altsol ==1
-disp('Alternate solution...');
+%disp('Alternate solution...');
 rangelow = round(0.25*length(Xvecfilt_detrended));
 rangehigh = round(0.75*length(Xvecfilt_detrended));
 Xvecfilt_detrended = Xvecfilt_detrended - mean([max(Xvecfilt_detrended(rangelow:rangehigh)) min(Xvecfilt_detrended(rangelow:rangehigh))]);
 
+if figures==1
 figure;
 subplot(4,1,2); plot(time,movingavgX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
 movingstdX = movingstd(Xvec,win,'central');
 subplot(4,1,3); plot(time,movingstdX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
 subplot(4,1,4); plot(time,Xvecfilt_detrended); ylabel('filtered time signal'); title('filtered and detrended signal');
+end
 
 % Find up and down positiosn
 Mup = zeros(1,length(Xvecfilt_detrended));          % initialize variables
@@ -292,7 +306,7 @@ else if isempty(nbinsdown) ==1 | isnan(nbinsdown)
     end
 end
 
-disp('Running statistics...');
+%disp('Running statistics...');
 % Run statistics
 [RTupexp_h, RTupexp_p] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p] = lillietest(uptimes);
@@ -303,11 +317,13 @@ disp('Running statistics...');
 [RTupgauss_h, RTupgauss_p(3)] = jbtest(uptimes);
 [RTdowngauss_h, RTdowngauss_p(3)] = jbtest(downtimes);
 
+if figures==1
 figure;
 subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_p,RTupgauss_p(1),RTupgauss_p(2),RTupgauss_p(3),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_p,RTdowngauss_p(1),RTdowngauss_p(2),RTdowngauss_p(3),num2str(down_events)));
+end
 
 if isempty(mintime) == 0
 uptimes(uptimes<mintime) = [];
@@ -326,24 +342,27 @@ if length(uptimes)>=4 & length(downtimes)>=4
 [RTupgauss_h, RTupgauss_p(3)] = jbtest(uptimes);
 [RTdowngauss_h, RTdowngauss_p(3)] = jbtest(downtimes);
 
+if figures==1
 figure;
 subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_p,RTupgauss_p(1),RTupgauss_p(2),RTupgauss_p(3),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_p,RTdowngauss_p(1),RTdowngauss_p(2),RTdowngauss_p(3),num2str(down_events)));
+end
+
 else
-    disp('Minimum number of observations not met for statistical test');
+    %disp('Minimum number of observations not met for statistical test');
 end
 end
 end
 
 if sopt==1
-display('Saving...');
+%display('Saving...');
 %save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/whitenoisemovingavg.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','F_rand','k_rand');
 %save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/Analysis/Fp1-kp1-start1end4e5-xfish1.0Noise.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','F_rand','k_rand');
 save(out);
 end
 
-display('Finished.');
+%display('Finished.');
 warning on;
 end
