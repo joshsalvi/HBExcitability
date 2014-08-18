@@ -73,7 +73,7 @@ if figures==1
 figure(1); subplot(4,1,1); plot(time,Xvec); title(sprintf('%s%s %s%s','F= ',num2str(F_rand(Np,Nt)),' k= ',num2str(k_rand(Np,Nt))));ylabel('%displacement')
 end
 % Moving window, running average using filter
-win = round(win1*Fs);                                     % CHOOSE WINDOW, must be ODD
+win = roundwin1*Fs;                                     % CHOOSE WINDOW, must be ODD
 if rem(floor(win),2) == 1 %odd
     win = floor(win);
 else %even

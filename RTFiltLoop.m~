@@ -15,9 +15,9 @@ winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)
 win1    = 500e-3;    % window (sec) if winloop=0; (CHOOSE)
 
 if winloop==1
-    winloopmin = 100e-3;     % minimum window for looping (CHOOSE)
-    winloopmax = 1000e-3;   % maximum window for looping (CHOOSE)
-    Nwinloop = 5;       % number of window loops (CHOOSE)
+    winloopmin = 200e-3;     % minimum window for looping (CHOOSE)
+    winloopmax = 3000e-3;   % maximum window for looping (CHOOSE)
+    Nwinloop = 10;       % number of window loops (CHOOSE)
     winlooprange = winloopmin:(winloopmax-winloopmin)/(Nwinloop-1):winloopmax;
 else
     winlooprange = win1;
@@ -27,14 +27,14 @@ Fs         = 10e3;     % sampling rate (Hz) (CHOOSE)
 
 freq1min   = 50;     % starting frequency of high-pass filter (CHOOSE)
 freq1max   = 1000;    % ending frequency of high-pass filter (CHOOSE)
-Nfreq1     = 30;      % number of frequencies to analyze (CHOOSE)
+Nfreq1     = 20;      % number of frequencies to analyze (CHOOSE)
 freq1range = freq1min:(freq1max-freq1min)/(Nfreq1-1):freq1max;
 
 mintimeyn = 1;      % loop through minimum times? (CHOOSE)
 if mintimeyn == 1
     minTmin   = 1e-3;    % minimum residence time allowed, min (CHOOSE)
     minTmax   = 100e-3;  % minimum residence time allowed, max (CHOOSE)
-    NminT     = 10;      % number of minimum times to loop through (CHOOSE)
+    NminT     = 15;      % number of minimum times to loop through (CHOOSE)
     minTrange = minTmin:(minTmax-minTmin)/(NminT-1):minTmax;
 else
     minT      = 1e-20;   % very small minT if not otherwise described
@@ -161,8 +161,8 @@ upT = minTrange(u); downT = minTrange(d);
 subplot(3,3,3);hold on;scatter(upT,m1(u),'ro');scatter(downT,n1(d),'ro');
 
 % Run RTfilt with the 
-dir_out = 
-RTfilt('a.mat',Fp,kp,winlooprange(b),mean([upF downF]),Fs,1,outfile,mean([upT downT]),1,1);
+outfile = sprintf('%s%s%s%s%s%s%s%s%s%s%s%s',dir_out,'-HPFilt',num2str(mean([upF downF])),'-DetrendWin',num2str(mean([upW downW])),'-MinimumResidenceTime',num2str(mean([upT downT])),'-Fs',num2str(Fs),'-','POSTPLOTS','.mat');
+RTfilt('a.mat',Fp,kp,mean([upW downW]),mean([upF downF]),Fs,1,outfile,mean([upT downT]),1,1);
 
 %%  Statistics on Filtered Data 
 % If savesig==1 above, then all of this statistics should have been saved
