@@ -1,4 +1,4 @@
-function [uptimes downtimes] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
+function [uptimes downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
 % Residence Time Calculations
 % This function defines the residence times for a signal by first finding
 % the moving average, then applies a high-pass filter at an input
@@ -8,7 +8,7 @@ function [uptimes downtimes] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,a
 % Freedman-Diaconis rule and calculates the statistics for both exponential
 % and normal distributions.
 %
-%     RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out)
+%  [uptimes downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
 %
 %  dir  :    directory of time signal
 %  Fp   :    force index
@@ -84,16 +84,19 @@ win2 = round(Fs/filtfreq2);
 
 movingavgX = filter(ones(1,win)/win,1,Xvec);
 Xvecfilt = medfilt1(Xvec,win2);
-Xvecfilt_detrended = Xvecfilt - movingavgX;
+% Use only last 80% of signal
+Xvecfilt_detrended = Xvecfilt(round(length(Xvecfilt)*0.2):end) - movingavgX(round(length(Xvecfilt)*0.2):end);
+time = time(round(length(Xvecfilt)*0.2:end));
 
 if figures==1
-subplot(4,1,2); plot(time,movingavgX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
+    subplot(4,1,1);subplot(4,1,1); hold on;plot(time,Xvec(round(length(Xvecfilt)*0.2:end)),'r'); title(sprintf('%s%s %s%s','F= ',num2str(F_rand(Np,Nt)),' k= ',num2str(k_rand(Np,Nt))));ylabel('%displacement')
+subplot(4,1,2); plot(time,movingavgX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
 movingstdX = movingstd(Xvec,win,'central');
-subplot(4,1,3); plot(time,movingstdX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
-subplot(4,1,4); plot(time,Xvecfilt_detrended); ylabel('filtered time signal'); title('filtered and detrended signal');
+subplot(4,1,3); plot(time,movingstdX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
+subplot(4,1,4); plot(time,Xvecfilt_detrended(1:length(time)),'r'); ylabel('filtered time signal'); title('filtered and detrended signal');
 end
 
-% Find up and down positiosn
+% Find up and down positions
 Mup = zeros(1,length(Xvecfilt_detrended));          % initialize variables
 Mdown = zeros(1,length(Xvecfilt_detrended));
 sup = find(Xvecfilt_detrended > 0);                 % find up/down positions
@@ -228,10 +231,10 @@ Xvecfilt_detrended = Xvecfilt_detrended - mean([max(Xvecfilt_detrended(rangelow:
 
 if figures==1
 figure;
-subplot(4,1,2); plot(time,movingavgX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
+subplot(4,1,2); plot(time,movingavgX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
 movingstdX = movingstd(Xvec,win,'central');
-subplot(4,1,3); plot(time,movingstdX); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
-subplot(4,1,4); plot(time,Xvecfilt_detrended); ylabel('filtered time signal'); title('filtered and detrended signal');
+subplot(4,1,3); plot(time,movingstdX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
+subplot(4,1,4); plot(time,Xvecfilt_detrended(1:length(time))); ylabel('filtered time signal'); title('filtered and detrended signal');
 end
 
 % Find up and down positiosn
@@ -324,9 +327,9 @@ end
 
 if figures==1
 figure;
-subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
+subplot(2,2,1);histfit(uptimes,nbinsup);title(sprintf('%s%s','Minimum time = ',num2str(mintime))); ylabel('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_p,RTupgauss_p(1),RTupgauss_p(2),RTupgauss_p(3),num2str(up_events)));
-subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
+subplot(2,2,3);histfit(downtimes,nbinsdown); title(sprintf('%s%s','Minimum time = ',num2str(mintime)));ylabel('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_p,RTdowngauss_p(1),RTdowngauss_p(2),RTdowngauss_p(3),num2str(down_events)));
 end
 
@@ -348,10 +351,10 @@ if length(uptimes)>=4 & length(downtimes)>=4
 [RTdowngauss_h, RTdowngauss_p(3)] = jbtest(downtimes);
 
 if figures==1
-figure;
-subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
+figure;title(sprintf('%s%s','Minimum time = ',num2str(mintime)));
+subplot(2,2,1);histfit(uptimes,nbinsup); title(sprintf('%s%s','Minimum time = ',num2str(mintime)));ylabel('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_p,RTupgauss_p(1),RTupgauss_p(2),RTupgauss_p(3),num2str(up_events)));
-subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
+subplot(2,2,3);histfit(downtimes,nbinsdown); title(sprintf('%s%s','Minimum time = ',num2str(mintime)));ylabel('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) p = %.1e\nLillie(gauss) p = %.1e\nKS p = %.1e\nJB p = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_p,RTdowngauss_p(1),RTdowngauss_p(2),RTdowngauss_p(3),num2str(down_events)));
 end
 
