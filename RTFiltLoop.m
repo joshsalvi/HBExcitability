@@ -5,14 +5,15 @@ display('Starting...');
 
 % input MAT file (CHOOSE)
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 4/20140221-cell4.mat';
-dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat';
+%dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat';
+dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
 
 % output directory and prefix (CHOOSE)
-dir_out = '/Users/joshsalvi/Downloads/output/noisysinewave-Fp3-kp3-';
+dir_out = '/Users/joshsalvi/Downloads/output/modelfish-Fp4-kp4-';
 
 % input operating point
-Fp = 3;         % force index (CHOOSE)
-kp = 3;         % stiffness index (CHOOSE)
+Fp = 4;         % force index (CHOOSE)
+kp = 4;        % stiffness index (CHOOSE)
 
 winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)
 win1    = 500e-3;    % window (sec) if winloop=0; (CHOOSE)
@@ -20,24 +21,24 @@ win1    = 500e-3;    % window (sec) if winloop=0; (CHOOSE)
 if winloop==1
     winloopmin = 50e-3;     % minimum window for looping (CHOOSE)
     winloopmax = 3000e-3;   % maximum window for looping (CHOOSE)
-    Nwinloop = 15;       % number of window loops (CHOOSE)
+    Nwinloop = 5;       % number of window loops (CHOOSE)
     winlooprange = winloopmin:(winloopmax-winloopmin)/(Nwinloop-1):winloopmax;
 else
     winlooprange = win1;
 end
 
-Fs         = 10e3;     % sampling rate (Hz) (CHOOSE)
+Fs         = 10e4;     % sampling rate (Hz) (CHOOSE)
 
 freq1min   = 50;     % starting frequency of high-pass filter (CHOOSE)
 freq1max   = 2000;    % ending frequency of high-pass filter (CHOOSE)
-Nfreq1     = 15;      % number of frequencies to analyze (CHOOSE)
+Nfreq1     = 5;      % number of frequencies to analyze (CHOOSE)
 freq1range = freq1min:(freq1max-freq1min)/(Nfreq1-1):freq1max;
 
 mintimeyn = 1;      % loop through minimum times? (CHOOSE)
 if mintimeyn == 1
     minTmin   = 1e-3;    % minimum residence time allowed, min (CHOOSE)
     minTmax   = 200e-3;  % minimum residence time allowed, max (CHOOSE)
-    NminT     = 15;      % number of minimum times to loop through (CHOOSE)
+    NminT     = 5;      % number of minimum times to loop through (CHOOSE)
     minTrange = minTmin:(minTmax-minTmin)/(NminT-1):minTmax;
 else
     minT      = 1e-20;   % very small minT if not otherwise described
