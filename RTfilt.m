@@ -1,4 +1,4 @@
-function [uptimes downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
+function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
 % Residence Time Calculations
 % This function defines the residence times for a signal by first finding
 % the moving average, then applies a high-pass filter at an input
@@ -99,15 +99,15 @@ end
 % Find up and down positions
 Mup = zeros(1,length(Xvecfilt_detrended));          % initialize variables
 Mdown = zeros(1,length(Xvecfilt_detrended));
-sup = find(Xvecfilt_detrended > 0);                 % find up/down positions, those that are >0 or <0
-sdown = find(Xvecfilt_detrended < 0);
+sup = Xvecfilt_detrended > 0;                 % find up/down positions, those that are >0 or <0
+sdown = Xvecfilt_detrended < 0;
 Mup(sup) = 1;
 Mdown(sdown) = 1;
 
 updiffend = find(diff(Mup)==-1);           % find up times
 updiffstart = find(diff(Mup)==1);
 
-if isempty(updiffend)==0 || isempty(updiffstart)==0
+if isempty(updiffend)==0 && isempty(updiffstart)==0
 if updiffend(1)<updiffstart(1)
     updiffend(1)=[];
 end
@@ -130,7 +130,7 @@ end
 downdiffend = find(diff(Mdown)==-1);         % find down times
 downdiffstart = find(diff(Mdown)==1);
 
-if isempty(downdiffend)==0 || isempty(downdiffstart)==0
+if isempty(downdiffend)==0 && isempty(downdiffstart)==0
 if downdiffend(1)<downdiffstart(1)
     downdiffend(1)=[];
 end
@@ -156,7 +156,7 @@ nbinsup = round((max(uptimes) - min(uptimes))/binsizeup);
 nbinsdown = round((max(downtimes) - min(downtimes))/binsizedown);
 if nbinsup > 1e4                    % maximum limit on bins to reduce memory use
     nbinsup = 1e4;
-else if isempty(nbinsup) ==1 | isnan(nbinsup)
+else if isempty(nbinsup) ==1 || isnan(nbinsup)
         nbinsup=2;
     else if nbinsup < 4
             nbinsup = 4;
@@ -165,7 +165,7 @@ else if isempty(nbinsup) ==1 | isnan(nbinsup)
 end
 if nbinsdown > 1e4
     nbinsdown = 1e4;
-else if isempty(nbinsdown) ==1 | isnan(nbinsdown)
+else if isempty(nbinsdown) ==1 || isnan(nbinsdown)
         nbinsdown=2;
     else if nbinsdown < 4
             nbinsdown = 4;
@@ -173,16 +173,17 @@ else if isempty(nbinsdown) ==1 | isnan(nbinsdown)
     end
 end
 
+if length(uptimes) >=4 && length(downtimes)>=4
 %disp('Running statistics...');
 % Run statistics
-[RTupexp_h, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
+[~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p, RTupgauss_stat] = lillietest(uptimes);
-[RTdownexp_h, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
+[~, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
 [~, RTdowngauss_p, RTdowngauss_stat] = lillietest(downtimes);
 [~, RTupgauss_p(2), RTupgauss_stat(2)] = kstest(uptimes);
 [~, RTdowngauss_p(2), RTdowngauss_stat(2)] = kstest(downtimes);
-[RTupgauss_h, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
-[RTdowngauss_h, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
+[~, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
+[~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
 
 if figures==1
 figure;
@@ -190,6 +191,7 @@ subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),num2str(down_events)));
+end
 end
 
 if isempty(mintime) == 0
@@ -199,15 +201,15 @@ up_events = length(uptimes);
 down_events = length(downtimes);
 
 % Run statistics
-if length(uptimes) >=4 & length(downtimes)>=4
-[RTupexp_h, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
+if length(uptimes) >=4 && length(downtimes)>=4
+[~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p, RTupgauss_stat] = lillietest(uptimes);
-[RTdownexp_h, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
+[~, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
 [~, RTdowngauss_p, RTdowngauss_stat] = lillietest(downtimes);
 [~, RTupgauss_p(2), RTupgauss_stat(2)] = kstest(uptimes);
 [~, RTdowngauss_p(2), RTdowngauss_stat(2)] = kstest(downtimes);
-[RTupgauss_h, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
-[RTdowngauss_h, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
+[~, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
+[~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
 
 if figures==1
 figure;
@@ -241,15 +243,15 @@ end
 % Find up and down positiosn
 Mup = zeros(1,length(Xvecfilt_detrended));          % initialize variables
 Mdown = zeros(1,length(Xvecfilt_detrended));
-sup = find(Xvecfilt_detrended > 0);                 % find up/down positions
-sdown = find(Xvecfilt_detrended < 0);
+sup = Xvecfilt_detrended > 0;                 % find up/down positions
+sdown = Xvecfilt_detrended < 0;
 Mup(sup) = 1;
 Mdown(sdown) = 1;
 
 updiffend = find(diff(Mup)==-1);           % find up times
 updiffstart = find(diff(Mup)==1);
 
-if isempty(updiffend)==0 || isempty(updiffstart)==0
+if isempty(updiffend)==0 && isempty(updiffstart)==0
 if updiffend(1)<updiffstart(1)
     updiffend(1)=[];
 end
@@ -272,7 +274,7 @@ end
 downdiffend = find(diff(Mdown)==-1);         % find down times
 downdiffstart = find(diff(Mdown)==1);
 
-if isempty(downdiffend)==0 || isempty(downdiffstart)==0
+if isempty(downdiffend)==0 && isempty(downdiffstart)==0
 if downdiffend(1)<downdiffstart(1)
     downdiffend(1)=[];
 end
@@ -298,7 +300,7 @@ nbinsup = round((max(uptimes) - min(uptimes))/binsizeup);
 nbinsdown = round((max(downtimes) - min(downtimes))/binsizedown);
 if nbinsup > 1e4                    % maximum limit on bins to reduce memory use
     nbinsup = 1e4;
-else if isempty(nbinsup) ==1 | isnan(nbinsup)
+else if isempty(nbinsup) ==1 || isnan(nbinsup)
         nbinsup=2;
     else if nbinsup < 4
             nbinsup = 4;
@@ -307,7 +309,7 @@ else if isempty(nbinsup) ==1 | isnan(nbinsup)
 end
 if nbinsdown > 1e4
     nbinsdown = 1e4;
-else if isempty(nbinsdown) ==1 | isnan(nbinsdown)
+else if isempty(nbinsdown) ==1 || isnan(nbinsdown)
         nbinsdown=2;
     else if nbinsdown < 4
             nbinsdown = 4;
@@ -317,14 +319,14 @@ end
 
 %disp('Running statistics...');
 % Run statistics
-[RTupexp_h, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
+[~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p, RTupgauss_stat] = lillietest(uptimes);
-[RTdownexp_h, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
+[~, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
 [~, RTdowngauss_p, RTdowngauss_stat] = lillietest(downtimes);
 [~, RTupgauss_p(2), RTupgauss_stat(2)] = kstest(uptimes);
 [~, RTdowngauss_p(2), RTdowngauss_stat(2)] = kstest(downtimes);
-[RTupgauss_h, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
-[RTdowngauss_h, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
+[~, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
+[~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
 
 if figures==1
 figure; title('BEFORE MINIMUM TIME IMPLEMENTED');
@@ -340,16 +342,16 @@ downtimes(downtimes<mintime) = [];
 up_events = length(uptimes);
 down_events = length(downtimes);
 
-if length(uptimes)>=4 & length(downtimes)>=4
+if length(uptimes)>=4 && length(downtimes)>=4
 % Run statistics
-[RTupexp_h, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
+[~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p, RTupgauss_stat] = lillietest(uptimes);
-[RTdownexp_h, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
+[~, RTdownexp_p, RTdownexp_stat] = lillietest(downtimes,'Distr','exp');
 [~, RTdowngauss_p, RTdowngauss_stat] = lillietest(downtimes);
 [~, RTupgauss_p(2), RTupgauss_stat(2)] = kstest(uptimes);
 [~, RTdowngauss_p(2), RTdowngauss_stat(2)] = kstest(downtimes);
-[RTupgauss_h, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
-[RTdowngauss_h, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
+[~, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
+[~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
 
 if figures==1
 figure;title(sprintf('%s%s','Minimum time = ',num2str(mintime)));
