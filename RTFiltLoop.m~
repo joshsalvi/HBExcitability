@@ -9,11 +9,11 @@ display('Starting...');
 dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
 
 % output directory and prefix (CHOOSE)
-dir_out = '/Users/joshsalvi/Downloads/output/modelfish-Fp4-kp4-';
+dir_out = '/Users/joshsalvi/Downloads/output/modelfish-Fp7-kp7-';
 
 % input operating point
 Fp = 7;         % force index (CHOOSE)
-kp = 1;        % stiffness index (CHOOSE)
+kp = 7;        % stiffness index (CHOOSE)
 
 winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)
 win1    = 500e-3;    % window (sec) if winloop=0; (CHOOSE)
@@ -45,7 +45,7 @@ else
 end
 
 
-savesig  = 0;       % save the signal? (1=yes; 0=no) (CHOOSE)
+savesig = 0;       % save the signal? (1=yes; 0=no) (CHOOSE)
 outfile = 'xyz';    % initialize outfile    
 
 altsol  = 1;        % run alternative solutions? (1=yes; 0=no) (CHOOSE; default=1)
@@ -130,6 +130,8 @@ display('Finished.');
 % the code also plots the test statistics for each minimum time in case it
 % is desired to use these as cutoffs.
 runrt = 1;      % Run RTfilt and save?
+
+load('/Users/joshsalvi/Downloads/output/modelfish-Fp4-kp2-UpDownTimes.mat');
 
 warning off;
 % If figures==1 above, then other plots will be generated. This is highly
