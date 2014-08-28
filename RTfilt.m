@@ -323,6 +323,7 @@ else if isempty(nbinsdown) ==1 || isnan(nbinsdown)
 end
 
 %disp('Running statistics...');
+if length(uptimes)>=4 && length(downtimes)>=4
 % Run statistics
 [~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p, RTupgauss_stat] = lillietest(uptimes);
@@ -341,6 +342,7 @@ subplot(2,2,1);histfit(uptimes,nbinsup);title('BEFORE MINIMUM TIME IMPLEMENTED')
 subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),(RTuppoiss_pstats.chi2stat),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown);title('BEFORE MINIMUM TIME IMPLEMENTED');ylabel('RT down');
 subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),(RTdownpoiss_pstats.chi2stat),num2str(down_events)));
+end
 end
 
 if isempty(mintime) == 0
@@ -383,6 +385,31 @@ if sopt==1
 %save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/whitenoisemovingavg.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','F_rand','k_rand');
 %save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/Analysis/Fp1-kp1-start1end4e5-xfish1.0Noise.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','F_rand','k_rand');
 save(out);
+end
+
+if any(strcmp(who,'RTupexp_p')) ==0
+    RTupexp_p = 1;
+end
+if any(strcmp(who,'RTdownexp_p')) ==0
+    RTdownexp_p = 1;
+end
+if any(strcmp(who,'RTupgauss_p')) ==0
+    RTupgauss_p = 1;
+end
+if any(strcmp(who,'RTdowngauss_p')) ==0
+    RTdowngauss_p = 1;
+end
+if any(strcmp(who,'RTupexp_stat')) ==0
+    RTupexp_stat = 1;
+end
+if any(strcmp(who,'RTdownexp_stat')) ==0
+    RTdownexp_stat = 1;
+end
+if any(strcmp(who,'RTupgauss_stat')) ==0
+    RTupgauss_stat = 1;
+end
+if any(strcmp(who,'RTdowngauss_stat')) ==0
+    RTdowngauss_stat = 1;
 end
 
 %display('Finished.');

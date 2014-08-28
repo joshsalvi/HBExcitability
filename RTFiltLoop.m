@@ -4,16 +4,16 @@ clear all; close all;
 display('Starting...');
 
 % input MAT file (CHOOSE)
-%dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 4/20140221-cell4.mat';
+dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat';
-dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
+%dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
 
 % output directory and prefix (CHOOSE)
-dir_out = '/Users/joshsalvi/Downloads/output/modelfish-Fp7-kp7-';
+dir_out = '/Users/joshsalvi/Downloads/output/20140221-cell5-Fp1-kp1-';
 
 % input operating point
-Fp = 7;         % force index (CHOOSE)
-kp = 7;        % stiffness index (CHOOSE)
+Fp = 1;        % force index (CHOOSE)
+kp = 1;        % stiffness index (CHOOSE)
 
 winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)
 win1    = 500e-3;    % window (sec) if winloop=0; (CHOOSE)
@@ -27,7 +27,7 @@ else
     winlooprange = win1;
 end
 
-Fs         = 10e4;     % sampling rate (Hz) (CHOOSE)
+Fs         = 10e3;     % sampling rate (Hz) (CHOOSE)
 
 freq1min   = 50;     % starting frequency of high-pass filter (CHOOSE)
 freq1max   = 2000;    % ending frequency of high-pass filter (CHOOSE)
@@ -131,7 +131,7 @@ display('Finished.');
 % is desired to use these as cutoffs.
 runrt = 1;      % Run RTfilt and save?
 
-load('/Users/joshsalvi/Downloads/output/modelfish-Fp1-kp1-UpDownTimes.mat');
+%load('/Users/joshsalvi/Downloads/output/modelfish-Fp3-kp1-UpDownTimes.mat');
 
 warning off;
 % If figures==1 above, then other plots will be generated. This is highly

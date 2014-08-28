@@ -190,9 +190,9 @@ if length(uptimes) >=4 && length(downtimes)>=4
 if figures==1
 figure;
 subplot(2,2,1);histfit(uptimes,nbinsup); title('RT up');
-subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),num2str(up_events)));
+subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),(RTuppoiss_pstats.chi2stat),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title('RT down');
-subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),num2str(down_events)));
+subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),(RTdownpoiss_pstats.chi2stat),num2str(down_events)));
 end
 end
 
@@ -219,9 +219,9 @@ if length(uptimes) >=4 && length(downtimes)>=4
 if figures==1
 figure;
 subplot(2,2,1);histfit(uptimes,nbinsup); title(sprintf('%s%s','Minimum time = ',num2str(mintime)));ylabel('RT up');
-subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),num2str(up_events)));
+subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),(RTuppoiss_pstats.chi2stat),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title(sprintf('%s%s','Minimum time = ',num2str(mintime)));ylabel('RT down');
-subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),num2str(down_events)));
+subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),(RTdownpoiss_pstats.chi2stat),num2str(down_events)));
 end
 
 else
@@ -323,6 +323,7 @@ else if isempty(nbinsdown) ==1 || isnan(nbinsdown)
 end
 
 %disp('Running statistics...');
+if length(uptimes)>=4 && length(downtimes)>=4
 % Run statistics
 [~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
 [~, RTupgauss_p, RTupgauss_stat] = lillietest(uptimes);
@@ -338,18 +339,19 @@ end
 if figures==1
 figure; title('BEFORE MINIMUM TIME IMPLEMENTED');
 subplot(2,2,1);histfit(uptimes,nbinsup);title('BEFORE MINIMUM TIME IMPLEMENTED'); ylabel('RT up');
-subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),num2str(up_events)));
+subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),(RTuppoiss_pstats.chi2stat),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown);title('BEFORE MINIMUM TIME IMPLEMENTED');ylabel('RT down');
-subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),num2str(down_events)));
+subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),(RTdownpoiss_pstats.chi2stat),num2str(down_events)));
+end
 end
 
 if isempty(mintime) == 0
-%{
+
 uptimes(uptimes<mintime) = [];
 downtimes(downtimes<mintime) = [];
 up_events = length(uptimes);
 down_events = length(downtimes);
-%}
+
 if length(uptimes)>=4 && length(downtimes)>=4
 % Run statistics
 [~, RTupexp_p, RTupexp_stat] = lillietest(uptimes,'Distr','exp');
@@ -367,9 +369,9 @@ if length(uptimes)>=4 && length(downtimes)>=4
 if figures==1
 figure;title(sprintf('%s%s','Minimum time = ',num2str(mintime)));
 subplot(2,2,1);histfit(uptimes,nbinsup);title(sprintf('%s%s','Minimum time = ',num2str(mintime))); ylabel('RT up');
-subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),num2str(up_events)));
+subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(uptimes),std(uptimes),median(uptimes),min(uptimes),max(uptimes),RTupexp_stat,RTupgauss_stat(1),RTupgauss_stat(2),RTupgauss_stat(3),(RTuppoiss_pstats.chi2stat),num2str(up_events)));
 subplot(2,2,3);histfit(downtimes,nbinsdown); title(sprintf('%s%s','Minimum time = ',num2str(mintime)));ylabel('RT down');
-subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),num2str(down_events)));
+subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(downtimes),std(downtimes),median(downtimes),min(downtimes),max(downtimes),RTdownexp_stat,RTdowngauss_stat(1),RTdowngauss_stat(2),RTdowngauss_stat(3),(RTdownpoiss_pstats.chi2stat),num2str(down_events)));
 end
 
 else
@@ -385,6 +387,8 @@ if sopt==1
 save(out);
 end
 
+if isempty(RTupexp_p) ==1
+    RTupexp_p = 
 %display('Finished.');
 warning on;
 end
