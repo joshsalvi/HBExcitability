@@ -1,4 +1,4 @@
-function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
+function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat,RTuppoiss_stat,RTuppoiss_p,RTdownpoiss_stat,RTdownpoiss_p] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures,offsetyn,offset2)
 % Residence Time Calculations
 % This function defines the residence times for a signal by first finding
 % the moving average, then applies a high-pass filter at an input
@@ -57,6 +57,7 @@ Xvec = Xd(startl:endl,Np,Nt);
 
 Xvec = Xvec(1:10:end);             % downsample (optional)
 
+
 clear Xd;
 
 % FORCE ONLY
@@ -86,6 +87,10 @@ movingavgX = filter(ones(1,win)/win,1,Xvec);
 Xvecfilt = medfilt1(Xvec,win2);
 % Use only last 80% of signal
 Xvecfilt_detrended = Xvecfilt(round(length(Xvecfilt)*0.2):end) - movingavgX(round(length(Xvecfilt)*0.2):end);
+if offsetyn == 1
+    Xvecfilt_detrended = Xvecfilt_detrended + offset2;
+end
+
 time = time(round(length(Xvecfilt)*0.2:end));
 
 if figures==1
@@ -236,7 +241,9 @@ if altsol ==1
 rangelow = round(0.25*length(Xvecfilt_detrended));
 rangehigh = round(0.75*length(Xvecfilt_detrended));
 Xvecfilt_detrended = Xvecfilt_detrended - mean([max(Xvecfilt_detrended(rangelow:rangehigh)) min(Xvecfilt_detrended(rangelow:rangehigh))]);
-
+if offsetyn == 1
+    Xvecfilt_detrended = Xvecfilt_detrended + offset2;
+end
 if figures==1
 figure;
 subplot(4,1,2); plot(time,movingavgX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
@@ -335,7 +342,8 @@ if length(uptimes)>=4 && length(downtimes)>=4
 [~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
 [~, RTuppoiss_p, RTuppoiss_pstats]=chi2gof(uptimes,'cdf',@(z)poisscdf(z,mean(uptimes)),'nparams',1);
 [~, RTdownpoiss_p, RTdownpoiss_pstats]=chi2gof(downtimes,'cdf',@(z)poisscdf(z,mean(downtimes)),'nparams',1);
-
+RTuppoiss_stat=RTuppoiss_pstats.chi2stat;
+RTdownpoiss_stat=RTdownpoiss_pstats.chi2stat;
 if figures==1
 figure; title('BEFORE MINIMUM TIME IMPLEMENTED');
 subplot(2,2,1);histfit(uptimes,nbinsup);title('BEFORE MINIMUM TIME IMPLEMENTED'); ylabel('RT up');
@@ -364,7 +372,8 @@ if length(uptimes)>=4 && length(downtimes)>=4
 [~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
 [~, RTuppoiss_p, RTuppoiss_pstats]=chi2gof(uptimes,'cdf',@(z)poisscdf(z,mean(uptimes)),'nparams',1);
 [~, RTdownpoiss_p, RTdownpoiss_pstats]=chi2gof(downtimes,'cdf',@(z)poisscdf(z,mean(downtimes)),'nparams',1);
-
+RTuppoiss_stat=RTuppoiss_pstats.chi2stat;
+RTdownpoiss_stat=RTdownpoiss_pstats.chi2stat;
 
 if figures==1
 figure;title(sprintf('%s%s','Minimum time = ',num2str(mintime)));

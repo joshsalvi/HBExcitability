@@ -1,4 +1,4 @@
-function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures)
+function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures,offsetyn,offset2)
 % Residence Time Calculations
 % This function defines the residence times for a signal by first finding
 % the moving average, then applies a high-pass filter at an input
@@ -51,11 +51,12 @@ Ord_F = unique(F_rand);
 
 [Np,Nt] = ind2sub(size(F_rand),find(k_rand==Ord_k(kp) & F_rand==Ord_F(Fp)));
 
-startl = 1;                      % how much time would you like to use?
+startl = len;                      % how much time would you like to use?
 endl = length(Xd);
 Xvec = Xd(startl:endl,Np,Nt);
 
 Xvec = Xvec(1:10:end);             % downsample (optional)
+
 
 clear Xd;
 
@@ -86,6 +87,10 @@ movingavgX = filter(ones(1,win)/win,1,Xvec);
 Xvecfilt = medfilt1(Xvec,win2);
 % Use only last 80% of signal
 Xvecfilt_detrended = Xvecfilt(round(length(Xvecfilt)*0.2):end) - movingavgX(round(length(Xvecfilt)*0.2):end);
+if offsetyn == 1
+    Xvecfilt_detrended = Xvecfilt_detrended + offset2;
+end
+
 time = time(round(length(Xvecfilt)*0.2:end));
 
 if figures==1
@@ -236,7 +241,9 @@ if altsol ==1
 rangelow = round(0.25*length(Xvecfilt_detrended));
 rangehigh = round(0.75*length(Xvecfilt_detrended));
 Xvecfilt_detrended = Xvecfilt_detrended - mean([max(Xvecfilt_detrended(rangelow:rangehigh)) min(Xvecfilt_detrended(rangelow:rangehigh))]);
-
+if offsetyn == 1
+    Xvecfilt_detrended = Xvecfilt_detrended + offset2;
+end
 if figures==1
 figure;
 subplot(4,1,2); plot(time,movingavgX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
@@ -387,8 +394,31 @@ if sopt==1
 save(out);
 end
 
-if isempty(RTupexp_p) ==1
-    RTupexp_p = 
+if any(strcmp(who,'RTupexp_p')) ==0
+    RTupexp_p = 1;
+end
+if any(strcmp(who,'RTdownexp_p')) ==0
+    RTdownexp_p = 1;
+end
+if any(strcmp(who,'RTupgauss_p')) ==0
+    RTupgauss_p = 1;
+end
+if any(strcmp(who,'RTdowngauss_p')) ==0
+    RTdowngauss_p = 1;
+end
+if any(strcmp(who,'RTupexp_stat')) ==0
+    RTupexp_stat = 1;
+end
+if any(strcmp(who,'RTdownexp_stat')) ==0
+    RTdownexp_stat = 1;
+end
+if any(strcmp(who,'RTupgauss_stat')) ==0
+    RTupgauss_stat = 1;
+end
+if any(strcmp(who,'RTdowngauss_stat')) ==0
+    RTdowngauss_stat = 1;
+end
+
 %display('Finished.');
 warning on;
 end
