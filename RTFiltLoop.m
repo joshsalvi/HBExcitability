@@ -234,6 +234,7 @@ disp(sprintf('%s%s\n%s%s\n%s%s','win= ',num2str(mean([upW downW])),'freq= ',num2
 %% Option(2) Analyze data via LOOPING
 
 clear all; close all;
+disp('Loading...');
 load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat')
 save('a.mat')
 clear all;
@@ -247,10 +248,9 @@ clear all;
 % the number of events with a change in the minimum window size. However,
 % the code also plots the test statistics for each minimum time in case it
 % is desired to use these as cutoffs.
-disp('Starting...');
 
 % initialize
-N_F = 20;
+N_F = 15;
 N_k = 1;
 
 disp('Looping...');
