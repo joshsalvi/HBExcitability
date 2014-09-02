@@ -4,15 +4,15 @@ clear all; close all;
 display('Starting...');
 
 % input MAT file (CHOOSE)
-dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat';
+dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 4/20140221-cell4.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
 
 % output directory and prefix (CHOOSE)
-dir_out = '/Users/joshsalvi/Downloads/output/20140221-cell5-Fp15-kp1-';
+dir_out = '/Users/joshsalvi/Downloads/output/20140221-cell4-Fp11-kp1-';
 
 % input operating point
-Fp = 15;        % force index (CHOOSE)
+Fp = 11;        % force index (CHOOSE)
 kp = 1;        % stiffness index (CHOOSE)
 
 winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)

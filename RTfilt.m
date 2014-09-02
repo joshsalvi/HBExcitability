@@ -1,4 +1,4 @@
-function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat,RTuppoiss_stat,RTuppoiss_p,RTdownpoiss_stat,RTdownpoiss_p] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures,offsetyn,offset2)
+function [uptimes, downtimes, Xvecfilt_detrended,RTupexp_p,RTupgauss_p,RTdownexp_p,RTdowngauss_p,RTupexp_stat,RTdownexp_stat,RTupgauss_stat,RTdowngauss_stat,poissmovwin_up,poissmovwin_down,movwinrange] = RTfilt(dir,Fp,kp,win1,freq1,Fs,sopt,out,mintime,altsol,figures,offsetyn,offset2)
 % Residence Time Calculations
 % This function defines the residence times for a signal by first finding
 % the moving average, then applies a high-pass filter at an input
@@ -111,6 +111,24 @@ Mdown(sdown) = 1;
 
 updiffend = find(diff(Mup)==-1);           % find up times
 updiffstart = find(diff(Mup)==1);
+
+% Find number of events for different window sizes so that this can be fit
+% to a Poisson distribution
+    Nmovwin = 5;
+    winlow = length(Mup)*0.005;
+    winhigh = length(Mup)*0.05;
+    movwinrange = round(winlow:(winhigh-winlow)/(Nmovwin-1):winhigh);
+for j = 1:Nmovwin
+    movstep = round(movwinrange(j)*0.1);        % 90% overlap
+    if movstep == 0
+        movstep = 1;
+    end
+    Nstep = floor(length(Mup)/movwinrange(j));
+    for i = 1:Nstep
+    poissmovwin_up(i,j) = sum(abs(diff(Mup((1+(i-1)*movstep):(movwinrange(j)+(i-1)*movstep)))))/2;
+    poissmovwin_down(i,j) = sum(abs(diff(Mdown((1+(i-1)*movstep):(movwinrange(j)+(i-1)*movstep)))))/2;
+    end
+end
 
 if isempty(updiffend)==0 && isempty(updiffstart)==0
 if updiffend(1)<updiffstart(1)
@@ -262,6 +280,26 @@ Mdown(sdown) = 1;
 
 updiffend = find(diff(Mup)==-1);           % find up times
 updiffstart = find(diff(Mup)==1);
+
+
+% Find number of events for different window sizes so that this can be fit
+% to a Poisson distribution
+    Nmovwin = 5;
+    winlow = length(Mup)*0.005;
+    winhigh = length(Mup)*0.05;
+    movwinrange = round(winlow:(winhigh-winlow)/(Nmovwin-1):winhigh);
+for j = 1:Nmovwin
+    movstep = round(movwinrange(j)*0.1);        % 90% overlap
+    if movstep == 0
+        movstep = 1;
+    end
+    Nstep = floor(length(Mup)/movwinrange(j));
+    for i = 1:Nstep
+    poissmovwin_up(i,j) = sum(abs(diff(Mup((1+(i-1)*movstep):(movwinrange(j)+(i-1)*movstep)))))/2;
+    poissmovwin_down(i,j) = sum(abs(diff(Mdown((1+(i-1)*movstep):(movwinrange(j)+(i-1)*movstep)))))/2;
+    end
+end
+
 
 if isempty(updiffend)==0 && isempty(updiffstart)==0
 if updiffend(1)<updiffstart(1)
