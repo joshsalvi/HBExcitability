@@ -378,8 +378,8 @@ if length(uptimes)>=4 && length(downtimes)>=4
 [~, RTdowngauss_p(2), RTdowngauss_stat(2)] = kstest(downtimes);
 [~, RTupgauss_p(3), RTupgauss_stat(3)] = jbtest(uptimes);
 [~, RTdowngauss_p(3), RTdowngauss_stat(3)] = jbtest(downtimes);
-[~, RTuppoiss_p, RTuppoiss_pstats]=chi2gof(uptimes,'cdf',@(z)poisscdf(z,mean(uptimes)),'nparams',1);
-[~, RTdownpoiss_p, RTdownpoiss_pstats]=chi2gof(downtimes,'cdf',@(z)poisscdf(z,mean(downtimes)),'nparams',1);
+[~, ~, RTuppoiss_pstats]=chi2gof(uptimes,'cdf',@(z)poisscdf(z,mean(uptimes)),'nparams',1);
+[~, ~, RTdownpoiss_pstats]=chi2gof(downtimes,'cdf',@(z)poisscdf(z,mean(downtimes)),'nparams',1);
 RTuppoiss_stat=RTuppoiss_pstats.chi2stat;
 RTdownpoiss_stat=RTdownpoiss_pstats.chi2stat;
 if figures==1

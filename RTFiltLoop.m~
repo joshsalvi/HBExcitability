@@ -4,15 +4,15 @@ clear all; close all;
 display('Starting...');
 
 % input MAT file (CHOOSE)
-dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 4/20140221-cell4.mat';
+dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell8.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
 
 % output directory and prefix (CHOOSE)
-dir_out = '/Users/joshsalvi/Downloads/output/20140221-cell4-Fp11-kp1-';
+dir_out = '/Users/joshsalvi/Downloads/output/olddata/20130419-cell8-Fp3-kp1-';
 
 % input operating point
-Fp = 11;        % force index (CHOOSE)
+Fp = 3;        % force index (CHOOSE)
 kp = 1;        % stiffness index (CHOOSE)
 
 winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)
@@ -97,6 +97,12 @@ if a == round(length(freq1range)/2)
 end
 end
 
+%Initialize
+RTdowngauss_p2 = zeros(3,length(freq1range),length(winlooprange),length(minTrange));
+RTupgauss_p2 = zeros(3,length(freq1range),length(winlooprange),length(minTrange));
+RTupgauss_stat2 = zeros(3,length(freq1range),length(winlooprange),length(minTrange));
+RTdowngauss_stat2 = zeros(3,length(freq1range),length(winlooprange),length(minTrange));
+
 disp('Saving number of events...');
 for a = 1:length(freq1range)
     for b = 1:length(winlooprange)
@@ -119,7 +125,7 @@ display('Finished.');
 
 %% Pre-load (RUN FIRST - just once per cell)
 clear all; close all;
-load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 4/20140221-cell4.mat')
+load('/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell7.mat')
 save('a.mat')
 clear all;
 %% Option(1) Plot the data and run RTfilt based on set parameters
@@ -135,10 +141,10 @@ close all;
 % is desired to use these as cutoffs.
 runrt = 1;      % Run RTfilt and save?
 offsetyn = 1;   % apply an offset?    %% USE IN CASES WHERE COUNTS BEGIN TO INCREASE AGAIN BY MORE THAN TWOFOLD 
-offset = 10;
+offset = 0;
 
 % load the correct files
-load('/Users/joshsalvi/Downloads/output/20140221-cell4-Fp3-kp1-UpDownTimes.mat');
+load('/Users/joshsalvi/Downloads/output/olddata/20130419-cell7-Fp19-kp1-UpDownTimes.mat');
 
 warning off;
 % If figures==1 above, then other plots will be generated. This is highly
@@ -235,7 +241,8 @@ disp(sprintf('%s%s\n%s%s\n%s%s','win= ',num2str(mean([upW downW])),'freq= ',num2
 
 clear all; close all;
 disp('Loading...');
-load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 4/20140221-cell4.mat')
+%load('/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell7.mat')
+load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat')
 save('a.mat')
 clear all;
 
@@ -257,31 +264,32 @@ disp('Looping...');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%   LOOPS   %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for Fp = 1:N_F                   
-    for kp = 1:N_k               
+for i = 1:N_F                   
+    for j = 1:N_k               
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%   INPUT   %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 % load the correct files
-file = '/Users/joshsalvi/Downloads/output/20140221-cell4-Fp';
+%file = '/Users/joshsalvi/Downloads/output/olddata/20130419-cell7-Fp';
+file = '/Users/joshsalvi/Downloads/output/20140221-cell5-Fp';
 runrt = 1;      % Run RTfilt and save?
 
 % constrain values? (0=no)
-constrain1 = 1;
+constrain1 = 0;
 % if you choose to constrain, what values would you like to use?
 win_in  = 0.05;
 freq_in = 2000;         % taken from individual examples in previous analysis (mean,mode,etc)
 minT_in = 0.0008;        % chosen from minimum values seen in individual histograms prior to implementation of a minimum time
 % plots? (1=yes)
 plotyn = 0;
-offsetyn = 1;   % apply an offset?    %% USE IN CASES WHERE COUNTS BEGIN TO INCREASE AGAIN BY MORE THAN TWOFOLD 
-offset = 10;
+offsetyn = 0;   % apply an offset?    %% USE IN CASES WHERE COUNTS BEGIN TO INCREASE AGAIN BY MORE THAN TWOFOLD 
+offset = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+Fp = i; kp = j;
 load(sprintf('%s%s%s%s%s',file,num2str(Fp),'-kp',num2str(kp),'-UpDownTimes.mat'));
-
+Fp = i; kp = j;
 warning off;
 % If figures==1 above, then other plots will be generated. This is highly
 % recommended to avoid a large number of plots from being generated.
@@ -400,16 +408,16 @@ end
 
 if runrt==1
     %disp('RTfilt() and Save: ON');
-outfile = sprintf('%s%s%s%s%s%s%s%s%s%s%s%s',dir_out,'-HPFilt',num2str(win_in),'-DetrendWin',num2str(mean([upW downW])),'-MinimumResidenceTime',num2str(mean([upT downT])),'-Fs',num2str(Fs),'-','POSTPLOTS','.mat');
+outfile = sprintf('%s%s%s%s%s%s%s%s%s%s%s%s',dir_out,'-HPFilt',num2str(freq_in),'-DetrendWin',num2str(win_in),'-MinimumResidenceTime',num2str(minT_in),'-Fs',num2str(Fs),'-','POSTPLOTS','.mat');
 [upt{Fp,kp}, downt{Fp,kp}, ~,RTupexp_p5(1,Fp,kp),RTupgauss_p5(1:3,Fp,kp),RTdownexp_p5(1,Fp,kp),RTdowngauss_p5(1:3,Fp,kp),RTupexp_stat5(1,Fp,kp),RTdownexp_stat5(1:3,Fp,kp),RTupgauss_stat5(1:3,Fp,kp),RTdowngauss_stat5(1:3,Fp,kp),poisswinmov_up5{Fp,kp},poisswinmov_down5{Fp,kp},movwinrange5{Fp,kp}]=RTfilt('a.mat',Fp,kp,win_in,freq_in,Fs,1,outfile,minT_in,1,0,offsetyn,offset);
 else
     disp('RTfilt() and Save: OFF');
 end
-
+%{
 if Fp == round(N_F/2)
     disp('...50%...');
 end
-
+%}
 up_eventsall(Fp,kp)   = length(upt{Fp,kp});
 down_eventsall(Fp,kp) = length(downt{Fp,kp});
 end
@@ -419,6 +427,139 @@ disp('Saving...');
 save(sprintf('%s%s',file,'-stats_all.mat'),'RTupexp_p5','RTupgauss_p5','RTdownexp_p5','RTdowngauss_p5','RTupexp_stat5','RTdownexp_stat5','RTupgauss_stat5','RTdowngauss_stat5','win_in','freq_in','minT_in','down_eventsall','up_eventsall','poisswinmov_up5','poisswinmov_down5','movwinrange5');
 disp('Finished.');
 
+
+%% Loop again to calculate the following:
+% (1) Exponential and Gaussian distribution statistics
+% (2) Mean residence times
+% (3) Poisson distribution statistics
+% (4) Additional work with the up and down times
+clear all; close all;
+
+disp('Initializing...');
+% LOAD DATA
+cd '/Users/joshsalvi/Downloads/output/';
+prefix = '20140221-cell5-';
+files = dir([prefix '*-POSTPLOTS.mat']);
+statfile = dir([prefix '*-stats_all.mat']);
+histyn = 0;
+
+disp('Looping through analyzed files...');
+for m = 1:length(files)
+    load(files(m).name);    % load        
+    meanRT_up(m)   = mean(uptimes);     % find mean time spent in the up and down states
+    meanRT_down(m) = mean(downtimes);
+    upt{m}   = uptimes;
+    downt{m} = downtimes;
+    % Fit:  normal, exponential, and poisson... RTupdistD{m}(1) will be the
+    % distribution RTupdistD{m}(1).DistName is the name of the distribution
+    % and RTupdistD{m}(1).Paramci are its fitting parameters
+    [RTupdistD{m} RTupdistPD{m}] = allfitdist(uptimes);
+    [RTdowndistD{m} RTdowndistPD{m}] = allfitdist(downtimes);
+    if m == round(length(files)/2)
+        disp('...50%...');
+    end
+end
+
+% Calculate information from stats
+disp('Running Statistics...');
+load(statfile.name);
+
+spikefreq_up   = up_eventsall./time(end);
+spikefreq_down = down_eventsall./time(end);
+
+if histyn ==1
+% Preload five histograms
+histindex = round(1:(length(files)-1)/(4):length(files));
+nbins = 20;
+
+for i = 1:5
+
+figure;
+subplot(2,2,1);histfit(upt{histindex(i)},nbins); title('RT up');
+subplot(2,2,2);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(upt{histindex(i)}),std(upt{histindex(i)}),median(upt{histindex(i)}),min(upt{histindex(i)}),max(upt{histindex(i)}),RTupexp_stat5(histindex(i)),RTupgauss_stat5(1,(histindex(i))),RTupgauss_stat5(2,(histindex(i))),RTupgauss_stat5(3,(histindex(i))),(RTuppoiss_pstats.chi2stat),num2str(up_eventsall(histindex(i)))));
+subplot(2,2,3);histfit(downt{histindex(i)},nbins); title('RT down');
+subplot(2,2,4);set(gca, 'visible', 'off');text(0,0.6,sprintf('Mean = %.5f\nStd. Dev. = %.5f\nMedian = %.5f\nMin = %.5f\nMax = %.5f\nLillie(exp) = %.1e\nLillie(gauss) = %.1e\nKS = %.1e\nJB = %.1e\nChi2(poiss) = %.1e\nNumber of counts = %s',mean(downt{histindex(i)}),std(downt{histindex(i)}),median(downt{histindex(i)}),min(downt{histindex(i)}),max(downt{histindex(i)}),RTdownexp_stat5(histindex(i)),RTdowngauss_stat5(1,(histindex(i))),RTdowngauss_stat5(2,(histindex(i))),RTdowngauss_stat5(3,(histindex(i))),(RTdownpoiss_pstats.chi2stat),num2str(down_eventsall(histindex(i)))));
+end
+end
+
+% Plot spike frequency, meanRT versus a control parameter
+forces = 1;
+stiffnesses = 0;
+force_c = 90e-12;
+stiffness_c = 600e-6;
+
+if forces == 1
+figure;
+plot((force_c-F_rand(1:length(spike_freq)))*1e12,spikefreq_up,'r');hold on;plot((force_c-F_rand(1:length(spike_freq)))*1e12,spikefreq_down,'b');plot((force_c-F_rand(1:length(spike_freq)))*1e12,sqrt((force_c-F_rand(1:length(spike_freq)))*1e12),'k--');
+title('Red=up, blue=down; dashed=sqrt(Fc-F)');xlabel('Force (pN)');ylabel('Spike Frequency (spikes/sec)');
+figure;
+plot((force_c-F_rand(1:length(spike_freq)))*1e12,meanRT_up,'r');hold on;plot((force_c-F_rand(1:length(spike_freq)))*1e12,meanRT_down,'b');
+title('Red=up, blue=down');xlabel('Force (pN)');ylabel('Mean Waiting Time (sec)');
+elseif stiffnesses == 1
+figure;
+plot((stiffness_c-k_rand(1:length(spike_freq)))*1e6,spikefreq_up,'r');hold on;plot((stiffness_c-k_rand(1:length(spike_freq)))*1e6,spikefreq_down,'b');plot((stiffness_c-k_rand(1:length(spike_freq)))*1e6,sqrt((stiffness_c-k_rand(1:length(spike_freq)))*1e6),'b');
+title('Red=up, blue=down');xlabel('Force (pN)');ylabel('Spike Frequency (spikes/sec)');
+plot((stiffness_c-k_rand(1:length(spike_freq)))*1e6,meanRT_up,'r');hold on;plot((stiffness_c-k_rand(1:length(spike_freq)))*1e6,meanRT_down,'b');
+title('Red=up, blue=down');xlabel('Force (pN)');ylabel('Mean Waiting Time (sec)');
+end
+
+% Plot statistics
+if forces == 1
+figure;
+subplot(2,2,1);
+plot(F_rand,RTupexp_stat5,'r');hold on;plot(F_rand,RTdownexp_stat5,'b'); ylabel('Lillie(exp) Stat');title('Red=up, blue=down');
+subplot(2,2,2);
+plot(F_rand,RTupgauss_stat5(1,:),'r');hold on;plot(F_rand,RTdowngauss_stat5(1,:),'b'); ylabel('Lillie(gauss) Stat');title('Red=up, blue=down');
+subplot(2,2,3);
+plot(F_rand,RTupgauss_stat5(2,:),'r');hold on;plot(F_rand,RTdowngauss_stat5(2,:),'b'); ylabel('JB Stat');title('Red=up, blue=down');
+subplot(2,2,4);
+plot(F_rand,RTupgauss_stat5(3,:),'r');hold on;plot(F_rand,RTdowngauss_stat5(3,:),'b'); ylabel('KS Stat');title('Red=up, blue=down');
+
+elseif stiffnesses == 1
+figure;
+subplot(2,2,1);
+plot(k_rand,RTupexp_stat5,'r');hold on;plot(k_rand,RTdownexp_stat5,'b'); ylabel('Lillie(exp) Stat');title('Red=up, blue=down');
+subplot(2,2,2);
+plot(k_rand,RTupgauss_stat5(1,:),'r');hold on;plot(k_rand,RTdowngauss_stat5(1,:),'b'); ylabel('Lillie(gauss) Stat');title('Red=up, blue=down');
+subplot(2,2,3);
+plot(k_rand,RTupgauss_stat5(2,:),'r');hold on;plot(k_rand,RTdowngauss_stat5(2,:),'b'); ylabel('JB Stat');title('Red=up, blue=down');
+subplot(2,2,4);
+plot(k_rand,RTupgauss_stat5(3,:),'r');hold on;plot(k_rand,RTdowngauss_stat5(3,:),'b'); ylabel('KS Stat');title('Red=up, blue=down');
+
+end
+
+% Loop through windows for Poisson distribution
+figure;
+for i = 1:length(poisswinmov_down5)
+    for j = 1:5
+        % Freedman-Diaconis Rule
+        poissbinup(i) = 2*iqr(poisswinmov_up5{i}(:,j))*length(poisswinmov_up5{i}(:,j))^(-1/3); 
+        poissbindown(i) = 2*iqr(poisswinmov_down5{i}(:,j))*length(poisswinmov_down5{i}(:,j))^(-1/3);
+        nbinspoissup(i) = round((max(poisswinmov_up5{i}(:,j)) - min(poisswinmov_up5{i}(:,j)))/poissbinup(i));
+        nbinspoissdown(i) = round((max(poisswinmov_down5{i}(:,j)) - min(poisswinmov_down5{i}(:,j)))/poissbindown(i));
+        if isnan(nbinspoissup(i)) == 1 | isinf(nbinspoissup(i)) == 1
+             nbinspoissup(i) = 5;
+        end
+        if isnan(nbinspoissdown(i)) == 1 | isinf(nbinspoissdown(i)) == 1
+             nbinspoissdown(i) = 5;
+        end
+        % Create
+        [poisshistupa{i,j},poisshistupb{i,j}]=hist(poisswinmov_up5{i}(:,j),nbinspoissup(i));
+        [poisshistdowna{i,j},poisshistdownb{i,j}]=hist(poisswinmov_down5{i}(:,j),nbinspoissdown(i));
+        % Fit to ALL : poisson, exponential, normal
+        [poissfitupD{i,j},poissfitupPD{i,j}] = allfitdist(poisswinmov_up5{i}(:,j));
+        [poissfitdownD{i,j},poissfitdownPD{i,j}] = allfitdist(poisswinmov_down5{i}(:,j));
+        set(0,'DefaultAxesColorOrder',autumn(5));
+         % Plot histograms
+        set(gca,'LooseInset',get(gca,'TightInset'));
+        subplot(2,length(poisswinmov_down5),i);set(gca,'LooseInset',get(gca,'TightInset'));;hold all;plot(poisshistupb{i,j},poisshistupa{i,j});title('Spike Distribution');ylabel('# Events');xlabel('Spikes/Window');hold all;
+        subplot(2,length(poisswinmov_down5),i+length(poisswinmov_down5));set(gca,'LooseInset',get(gca,'TightInset'));;hold all;plot(poisshistupb{i,j},poisshistupa{i,j});title('Spike Distribution');ylabel('# Events');xlabel('Spikes/Window');hold all;
+
+    end
+end
+
+disp('Saving...');
+save([prefix 'analyzeddata.mat'],'poisshistupa','poisshistupb','poisshistdowna','poisshistdownb','poissfitupD','poissfitdownD','RTupdistD','RTdowndistD','meanRT_up','meanRT_down','RTupexp_stat','RTdownexp_stat','RTupf
 
 %% DISCONTINUED Method
 warning('DISCONTINUED METHOD');
