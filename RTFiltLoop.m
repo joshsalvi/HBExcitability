@@ -244,6 +244,7 @@ clear all; close all;
 disp('Loading...');
 %load('/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell7.mat')
 load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat')
+%load('/Users/joshsalvi/Downloads/output/artificialwaveforms/waves.mat');
 save('a.mat')
 clear all;
 
@@ -273,18 +274,19 @@ for i = 1:N_F
 % load the correct files
 %file = '/Users/joshsalvi/Downloads/output/olddata/20130419-cell7-Fp';
 file = '/Users/joshsalvi/Downloads/output/20140221-cell5-Fp';
+%file = '/Users/joshsalvi/Downloads/output/artificialwaveforms/waves-Fp';
 runrt = 1;      % Run RTfilt and save?
 
 % constrain values? (0=no)
-constrain1 = 0;
+constrain1 = 1;
 % if you choose to constrain, what values would you like to use?
 win_in  = 0.05;
 freq_in = 2000;         % taken from individual examples in previous analysis (mean,mode,etc)
 minT_in = 0.0008;        % chosen from minimum values seen in individual histograms prior to implementation of a minimum time
 % plots? (1=yes)
 plotyn = 0;
-offsetyn = 0;   % apply an offset?    %% USE IN CASES WHERE COUNTS BEGIN TO INCREASE AGAIN BY MORE THAN TWOFOLD 
-offset = 0;
+offsetyn = 1;   % apply an offset?    %% USE IN CASES WHERE COUNTS BEGIN TO INCREASE AGAIN BY MORE THAN TWOFOLD 
+offset = 10;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -438,8 +440,8 @@ clear all; close all;
 
 disp('Initializing...');
 % LOAD DATA
-cd '/Users/joshsalvi/Downloads/output/olddata/';
-prefix = '20130419-cell8-';
+cd '/Users/joshsalvi/Downloads/output/constrain';
+prefix = '20140221-cell5';
 %cd '/Users/joshsalvi/Downloads/output/';
 %prefix = '20140221-cell4-';
 files = dir([prefix '*-POSTPLOTS.mat']);
@@ -458,6 +460,38 @@ for m = 1:length(files)
     % and RTupdistD{m}(1).Paramci are its fitting parameters
     [RTupdistD{m}, RTupdistPD{m}] = allfitdist(uptimes);
     [RTdowndistD{m}, RTdowndistPD{m}] = allfitdist(downtimes);
+    
+    % Chi-squared statistic: n.s. if normal distribution
+    [~,RTupgausschi2gof_p(m),RTupgausschi2gof_stat{m}]     = chi2gof(uptimes);
+    [~,RTdowngausschi2gof_p(m),RTdowngausschi2gof_stat{m}] = chi2gof(downtimes);
+    
+    clear binsizeup binsizedown
+    binsizeup = 2*iqr(uptimes)*length(uptimes)^(-1/3);      % freedman-diaconis rule
+    binsizedown = 2*iqr(downtimes)*length(downtimes)^(-1/3);
+    nbinsup(m) = round((max(uptimes) - min(uptimes))/binsizeup);
+    nbinsdown(m) = round((max(downtimes) - min(downtimes))/binsizedown);
+    if isnan(nbinsup(m)) == 1 || isinf(nbinsup(m)) == 1
+             nbinsup(m) = 5;
+    end
+    if isnan(nbinsdown(m)) == 1 || isinf(nbinsdown(m)) == 1
+             nbinsdown(m) = 5;
+    end
+    [upa{m} upb{m}] = hist(uptimes,nbinsup(m));      % make histograms
+    [downa{m} downb{m}] = hist(downtimes,nbinsdown(m));
+    n1 = sum(upa{m}); n2 = sum(downa{m});
+    pdup{m} = fitdist(upb{m}','Exponential','Frequency',upa{m}');
+    pddown{m} = fitdist(downb{m}','Exponential','Frequency',downa{m}');
+    expcountsup{m} = n1*pdf(pdup{m},upb{m}); expcountsdown{m} = n1*pdf(pddown{m},downb{m});
+    % Test for normal and exponential distributions using the chi-squared
+    % test
+    [~,RTupexpchi2gof_p(m),RTupexpchi2gof_stat{m}] = chi2gof(upb{m},'Ctrs',upb{m}, ...
+        'Frequency', upa{m}, ...
+        'Expected', expcountsup{m},...
+        'Nparams',1);
+    [~,RTdownexpchi2gof_p(m),RTdownexpchi2gof_stat{m}] = chi2gof(downb{m},'Ctrs',downb{m}, ...
+        'Frequency', downa{m}, ...
+        'Expected', expcountsdown{m},...
+        'Nparams',1);
     if m == round(length(files)/2)
         disp('...50%...');
     end
@@ -534,6 +568,7 @@ end
 
 % Loop through windows for Poisson distribution
 figure;
+warning off
 for i = 1:length(poisswinmov_down5)
     for j = 1:5
         % Freedman-Diaconis Rule
@@ -554,6 +589,22 @@ for i = 1:length(poisswinmov_down5)
         [poissfitupD{i,j},poissfitupPD{i,j}] = allfitdist(poisswinmov_up5{i}(:,j));
         [poissfitdownD{i,j},poissfitdownPD{i,j}] = allfitdist(poisswinmov_down5{i}(:,j));
         set(0,'DefaultAxesColorOrder',autumn(5));
+        % Use histogram information in a chi-squared goodness-of-fit test
+         n1 = sum(poisshistupa{i,j}); n2 = sum(poisshistdowna{i,j});
+         pdup_poiss{i,j} = fitdist(poisshistupb{i,j}','Poisson','Frequency',poisshistupa{i,j}');
+         pddown_poiss{i,j} = fitdist(poisshistdownb{i,j}','Poisson','Frequency',poisshistdowna{i,j}');
+         expcountsup_poiss{i,j} = n1*pdf(pdup_poiss{i,j},poisshistupb{i,j}); expcountsdown_poiss{i,j} = n1*pdf(pddown_poiss{i,j},poisshistdownb{i,j});
+         % Test for normal and exponential distributions using the chi-squared
+         % test
+         [~,Poissupchi2gof_p(i,j),Poissupchi2gof_stat{i,j}] = chi2gof(poisshistupb{i,j},'Ctrs',poisshistupb{i,j}, ...
+            'Frequency', poisshistupa{i,j}, ...
+            'Expected', expcountsup_poiss{i,j},...
+            'Nparams',1);
+         [~,Poissdownchi2gof_p(i,j),Poissdownchi2gof_stat{i,j}] = chi2gof(poisshistdownb{i,j},'Ctrs',poisshistdownb{i,j}, ...
+            'Frequency', poisshistdowna{i,j}, ...
+            'Expected', expcountsdown_poiss{i,j},...
+            'Nparams',1);
+        
          % Plot histograms
         set(gca,'LooseInset',get(gca,'TightInset'));
         subplot(2,length(poisswinmov_down5),i);set(gca,'LooseInset',get(gca,'TightInset'));hold all;plot(poisshistupb{i,j},poisshistupa{i,j});title('Spike Distribution');ylabel('# Events');xlabel('Spikes/Window');hold all;
@@ -562,8 +613,9 @@ for i = 1:length(poisswinmov_down5)
     end
 end
 
+
 disp('Saving...');
-save([prefix 'analyzeddata.mat'],'poisshistupa','poisshistupb','poisshistdowna','poisshistdownb','poissfitupD','poissfitdownD','RTupdistD','RTdowndistD','meanRT_up','meanRT_down','RTupexp_stat5','RTdownexp_stat5','RTupgauss_stat5','RTdowngauss_stat5','upt','downt','F_rand','k_rand','time','spikefreq_up','spikefreq_down');
+save([prefix 'analyzeddata.mat'],'poisshistupa','poisshistupb','poisshistdowna','poisshistdownb','poissfitupD','poissfitdownD','RTupdistD','RTdowndistD','meanRT_up','meanRT_down','RTupexp_stat5','RTdownexp_stat5','RTupgauss_stat5','RTdowngauss_stat5','upt','downt','F_rand','k_rand','time','spikefreq_up','spikefreq_down','Poissupchi2gof_p','Poissupchi2gof_stat','Poissdownchi2gof_p','Poissupchi2gof_stat','RTupgausschi2gof_p','RTupgausschi2gof_stat','RTdowngausschi2gof_p','RTdowngausschi2gof_stat','RTupexpchi2gof_p','RTupexpchi2gof_stat','RTdownexpchi2gof_p','RTdownexpchi2gof_stat','upa','upb','downb','downa','poisshistupa','poisshistupb','poisshistdownb','poisshistdowna');
 
 %% DISCONTINUED Method
 warning('DISCONTINUED METHOD');
