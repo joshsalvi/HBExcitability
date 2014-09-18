@@ -43,13 +43,13 @@ end
 % FORCE AND STIFFNESS
 
 
-Ord_k = unique(k_rand);
-Ord_F = unique(F_rand);
+Ord_k = unique(kv);
+Ord_F = unique(Fe);
 
 %Fp = 1;                             % SELECT OPERATING POINT
 %kp = 1;
 
-[Np,Nt] = ind2sub(size(F_rand),find(k_rand==Ord_k(kp) & F_rand==Ord_F(Fp)));
+[Np,Nt] = ind2sub(size(Fe),find(kv==Ord_k(kp) & Fe==Ord_F(Fp)));
 
 startl = 1;                      % how much time would you like to use?
 endl = length(Xd);
@@ -71,7 +71,7 @@ clear Xd;
 time = linspace(0,length(Xvec)/Fs,length(Xvec));    % time in seconds
 
 if figures==1
-figure; subplot(4,1,1); plot(time,Xvec); title(sprintf('%s%s %s%s','F= ',num2str(F_rand(Np,Nt)),' k= ',num2str(k_rand(Np,Nt))));ylabel('%displacement')
+figure; subplot(4,1,1); plot(time,Xvec); title(sprintf('%s%s %s%s','F= ',num2str(Fe(Np,Nt)),' k= ',num2str(kv(Np,Nt))));ylabel('%displacement')
 end
 % Moving window, running average using filter
 win = round(win1*Fs);                                     % CHOOSE WINDOW, must be ODD
@@ -94,7 +94,7 @@ end
 time = time(round(length(Xvecfilt)*0.2:end));
 
 if figures==1
-    subplot(4,1,1);subplot(4,1,1); hold on;plot(time,Xvec(round(length(Xvecfilt)*0.2:end)),'r'); title(sprintf('%s%s %s%s','F= ',num2str(F_rand(Np,Nt)),' k= ',num2str(k_rand(Np,Nt))));ylabel('%displacement')
+    subplot(4,1,1);subplot(4,1,1); hold on;plot(time,Xvec(round(length(Xvecfilt)*0.2:end)),'r'); title(sprintf('%s%s %s%s','F= ',num2str(Fe(Np,Nt)),' k= ',num2str(kv(Np,Nt))));ylabel('%displacement')
 subplot(4,1,2); plot(time,movingavgX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving average');
 movingstdX = movingstd(Xvec,win,'central');
 subplot(4,1,3); plot(time,movingstdX(round(length(Xvecfilt)*0.2:end))); title(sprintf('%s %s','window = ',num2str(win))); ylabel('moving standard deviation');
@@ -173,10 +173,8 @@ for i = 1:down_events
     downtimes(i) = time(downdiffend(i)) - time(downdiffstart(i));
 end
 
-binsizeup = 2*iqr(uptimes)*length(uptimes)^(-1/3);      % freedman-diaconis rule
-binsizedown = 2*iqr(downtimes)*length(downtimes)^(-1/3);
-nbinsup = round((max(uptimes) - min(uptimes))/binsizeup);
-nbinsdown = round((max(downtimes) - min(downtimes))/binsizedown);
+nbinsup = freedmandiaconis(uptimes);
+nbinsdown = freedmandiaconis(downtimes);
 if nbinsup > 1e4                    % maximum limit on bins to reduce memory use
     nbinsup = 1e4;
 else if isempty(nbinsup) ==1 || isnan(nbinsup)
@@ -344,10 +342,8 @@ for i = 1:down_events
     downtimes(i) = time(downdiffend(i)) - time(downdiffstart(i));
 end
 
-binsizeup = 2*iqr(uptimes)*length(uptimes)^(-1/3);      % freedman-diaconis rule
-binsizedown = 2*iqr(downtimes)*length(downtimes)^(-1/3);
-nbinsup = round((max(uptimes) - min(uptimes))/binsizeup);
-nbinsdown = round((max(downtimes) - min(downtimes))/binsizedown);
+nbinsup = freedmandiaconis(uptimes);
+nbinsdown = freedmandiaconis(downtimes);
 if nbinsup > 1e4                    % maximum limit on bins to reduce memory use
     nbinsup = 1e4;
 else if isempty(nbinsup) ==1 || isnan(nbinsup)
@@ -436,8 +432,8 @@ end
 
 if sopt==1
 %display('Saving...');
-%save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/whitenoisemovingavg.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','F_rand','k_rand');
-%save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/Analysis/Fp1-kp1-start1end4e5-xfish1.0Noise.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','F_rand','k_rand');
+%save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/whitenoisemovingavg.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','Fe','kv');
+%save('/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/Analysis/Fp1-kp1-start1end4e5-xfish1.0Noise.mat','Xvec','Fs','time','win','movingavgX','movingstdX','startl','endl','Fp','kp','Fe','kv');
 save(out);
 end
 

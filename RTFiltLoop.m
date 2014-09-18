@@ -4,16 +4,16 @@ clear all; close all;
 display('Starting...');
 
 % input MAT file (CHOOSE)
-dir_in = '/Users/joshsalvi/Downloads/output/artificialwaveforms/waves.mat';
-%dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell8.mat';
+%dir_in = '/Users/joshsalvi/Downloads/output/artificialwaveforms/waves.mat';
+dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-09-16.01/Ear 1/Cell 6/20140916-cell6-extracteddata.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/Sinusoids/noisysinewave.mat';
 %dir_in = '/Users/joshsalvi/Documents/Lab/Lab/Simulation Data/ONHFishJosh/xfish1.0Noise.mat';
 
 % output directory and prefix (CHOOSE)
-dir_out = '/Users/joshsalvi/Downloads/output/artificialwaveforms/waves-Fp7-kp1-';
+dir_out = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-09-16.01/Ear 1/Cell 6/spikedata/20140916-cell6-Fp19-kp1-';
 
 % input operating point
-Fp = 7;        % force index (CHOOSE)
+Fp = 19;        % force index (CHOOSE)
 kp = 1;        % stiffness index (CHOOSE)
 
 winloop = 1;         % loop through windows? (1=yes, 0=no) (CHOOSE)
@@ -28,7 +28,7 @@ else
     winlooprange = win1;
 end
 
-Fs         = 10e3;     % sampling rate (Hz) (CHOOSE)
+Fs         = 1e3;     % sampling rate (Hz) (CHOOSE)
 
 freq1min   = 50;     % starting frequency of high-pass filter (CHOOSE)
 freq1max   = 2000;    % ending frequency of high-pass filter (CHOOSE)
@@ -82,7 +82,8 @@ load(dir_in);
 %%%%%%%%%%%%   LOOPS   %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 display('Looping through windows...');
-save('a.mat','k_rand','F_rand','Xd');
+%save('a.mat','kv','Fe','Xd');
+save('a.mat','kv','Fe','Xd');
 
 for a = 1:length(freq1range)
     for b = 1:length(winlooprange)
@@ -126,7 +127,8 @@ display('Finished.');
 
 %% Pre-load (RUN FIRST - just once per cell)
 clear all; close all;
-load('/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell7.mat')
+%load('/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell7.mat')
+load('/Users/joshsalvi/Downloads/output/artificialwaveforms/waves.mat');
 save('a.mat')
 clear all;
 %% Option(1) Plot the data and run RTfilt based on set parameters
@@ -145,7 +147,8 @@ offsetyn = 1;   % apply an offset?    %% USE IN CASES WHERE COUNTS BEGIN TO INCR
 offset = 0;
 
 % load the correct files
-load('/Users/joshsalvi/Downloads/output/olddata/20130419-cell7-Fp19-kp1-UpDownTimes.mat');
+%load('/Users/joshsalvi/Downloads/output/olddata/20130419-cell7-Fp19-kp1-UpDownTimes.mat');
+load('/Users/joshsalvi/Downloads/output/artificialwaveforms/waves-Fp7-kp1-UpDownTimes.mat');
 
 warning off;
 % If figures==1 above, then other plots will be generated. This is highly
@@ -160,6 +163,7 @@ clear RTupexp_p RTdownexp_p RTupgauss_p2 RTdowngauss_p2 RTupgauss_p RTdowngauss_
 
 figure;
 subplot(3,3,1);xlabel('Detrending Window Size');
+sigfiltstd(isnan(sigfiltstd))=0;
 clear m m1 n n1;m=mean(mean(sigfiltstd,3),1);m1(:,:)=m;n=mean(mean(sigfiltstd,3),1);n1(:,:)=n;plot(winlooprange,m1,'r');hold on;plot(winlooprange,n1,'b');ylabel('RMS of Signal');xlabel('Detrending Window Size');
 [~, rupW]=fit(winlooprange',m1','exp1');[~, rdownW]=fit(winlooprange',m1','exp1');
 subplot(3,3,4);plot(winlooprange(2:end),diff(m1),'r');hold on;plot(winlooprange(2:end),diff(n1),'b');ylabel('Diff(RMS)');xlabel('Detrending Window Size');
@@ -243,8 +247,9 @@ disp(sprintf('%s%s\n%s%s\n%s%s','win= ',num2str(mean([upW downW])),'freq= ',num2
 clear all; close all;
 disp('Loading...');
 %load('/Users/joshsalvi/Documents/Lab/Lab/Data Analysis/State Spaces/20130419/20130419-cell7.mat')
-load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat')
-%load('/Users/joshsalvi/Downloads/output/artificialwaveforms/waves.mat');
+%load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-02-21.01/Ear 1/Cell 5/20140221-cell5.mat')
+%load('/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-09-16.01/Ear 1/Cell 7/20140916-cell7-extracteddata.mat');
+load('/Users/joshsalvi/Downloads/output/artificialwaveforms/waves.mat');
 save('a.mat')
 clear all;
 
@@ -259,7 +264,7 @@ clear all;
 % is desired to use these as cutoffs.
 
 % initialize
-N_F = 15;
+N_F = 7;
 N_k = 1;
 
 disp('Looping...');
@@ -272,15 +277,15 @@ for i = 1:N_F
 %%%%%%%%%%%%   INPUT   %%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 % load the correct files
-%file = '/Users/joshsalvi/Downloads/output/olddata/20130419-cell7-Fp';
-file = '/Users/joshsalvi/Downloads/output/20140221-cell5-Fp';
-%file = '/Users/joshsalvi/Downloads/output/artificialwaveforms/waves-Fp';
+%file = '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-09-16.01/Ear 1/Cell 7/spikedata/20140916-cell7-Fp';
+%file = '/Users/joshsalvi/Downloads/output/20140221-cell5-Fp';
+file = '/Users/joshsalvi/Downloads/output/artificialwaveforms/waves-Fp';
 runrt = 1;      % Run RTfilt and save?
 
 % constrain values? (0=no)
 constrain1 = 1;
 % if you choose to constrain, what values would you like to use?
-win_in  = 0.05;
+win_in  = 0.0003;
 freq_in = 2000;         % taken from individual examples in previous analysis (mean,mode,etc)
 minT_in = 0.0008;        % chosen from minimum values seen in individual histograms prior to implementation of a minimum time
 % plots? (1=yes)
@@ -293,6 +298,7 @@ offset = 10;
 Fp = i; kp = j;
 load(sprintf('%s%s%s%s%s',file,num2str(Fp),'-kp',num2str(kp),'-UpDownTimes.mat'));
 Fp = i; kp = j;
+sigfiltstd(isnan(sigfiltstd))=0;
 warning off;
 % If figures==1 above, then other plots will be generated. This is highly
 % recommended to avoid a large number of plots from being generated.
@@ -437,19 +443,21 @@ disp('Finished.');
 % (3) Poisson distribution statistics
 % (4) Additional work with the up and down times
 clear all; close all;
-
+warning off;
 disp('Initializing...');
 % LOAD DATA
-cd '/Users/joshsalvi/Downloads/output/constrain';
-prefix = '20140221-cell5';
-%cd '/Users/joshsalvi/Downloads/output/';
-%prefix = '20140221-cell4-';
+cd '/Users/joshsalvi/Downloads/output/artificialwaveforms';
+prefix = 'waves';
+
+%cd '/Users/joshsalvi/Documents/Lab/Lab/Clamp Data/2014-09-16.01/Ear 1/Cell 6/spikedata';
+%prefix = '20140916-cell6-';
 files = dir([prefix '*-POSTPLOTS.mat']);
 statfile = dir([prefix '*-stats_all.mat']);
-histyn = 0;
+histyn = 1;
 
 disp('Looping through analyzed files...');
 for m = 1:length(files)
+    warning off;
     load(files(m).name);    % load        
     meanRT_up(m)   = mean(uptimes);     % find mean time spent in the up and down states
     meanRT_down(m) = mean(downtimes);
@@ -466,18 +474,13 @@ for m = 1:length(files)
     [~,RTdowngausschi2gof_p(m),RTdowngausschi2gof_stat{m}] = chi2gof(downtimes);
     
     clear binsizeup binsizedown
-    binsizeup = 2*iqr(uptimes)*length(uptimes)^(-1/3);      % freedman-diaconis rule
-    binsizedown = 2*iqr(downtimes)*length(downtimes)^(-1/3);
-    nbinsup(m) = round((max(uptimes) - min(uptimes))/binsizeup);
-    nbinsdown(m) = round((max(downtimes) - min(downtimes))/binsizedown);
-    if isnan(nbinsup(m)) == 1 || isinf(nbinsup(m)) == 1
-             nbinsup(m) = 5;
-    end
-    if isnan(nbinsdown(m)) == 1 || isinf(nbinsdown(m)) == 1
-             nbinsdown(m) = 5;
-    end
+    nbinsup(m) = freedmandiaconis(uptimes);
+    nbinsdown(m) = freedmandiaconis(downtimes);
+
     [upa{m} upb{m}] = hist(uptimes,nbinsup(m));      % make histograms
     [downa{m} downb{m}] = hist(downtimes,nbinsdown(m));
+    upa{m}(upb{m}<0) = [];upb{m}(upb{m}<0) = [];
+    downa{m}(downb{m}<0) = [];downb{m}(downb{m}<0) = [];
     n1 = sum(upa{m}); n2 = sum(downa{m});
     pdup{m} = fitdist(upb{m}','Exponential','Frequency',upa{m}');
     pddown{m} = fitdist(downb{m}','Exponential','Frequency',downa{m}');
@@ -528,16 +531,16 @@ stiffness_c = 600e-6;
 
 if forces == 1
 figure;
-plot((force_c-F_rand(1:length(spikefreq_up)))*1e12,spikefreq_up,'r');hold on;plot((force_c-F_rand(1:length(spikefreq_up)))*1e12,spikefreq_down,'b');plot((force_c-F_rand(1:length(spikefreq_up)))*1e12,sqrt((force_c-F_rand(1:length(spikefreq_up)))*1e12),'k--');
+plot((force_c-Fe(1:length(spikefreq_up)))*1e12,spikefreq_up,'r');hold on;plot((force_c-Fe(1:length(spikefreq_up)))*1e12,spikefreq_down,'b');plot((force_c-Fe(1:length(spikefreq_up)))*1e12,sqrt((force_c-Fe(1:length(spikefreq_up)))*1e12),'k--');
 title('Red=up, blue=down; dashed=sqrt(Fc-F)');xlabel('Force (pN)');ylabel('Spike Frequency (spikes/sec)');
 figure;
-plot((force_c-F_rand(1:length(spikefreq_up)))*1e12,meanRT_up,'r');hold on;plot((force_c-F_rand(1:length(spikefreq_up)))*1e12,meanRT_down,'b');
+plot((force_c-Fe(1:length(spikefreq_up)))*1e12,meanRT_up,'r');hold on;plot((force_c-Fe(1:length(spikefreq_up)))*1e12,meanRT_down,'b');
 title('Red=up, blue=down');xlabel('Force (pN)');ylabel('Mean Waiting Time (sec)');
 elseif stiffnesses == 1
 figure;
-plot((stiffness_c-k_rand(1:length(spikefreq_up)))*1e6,spikefreq_up,'r');hold on;plot((stiffness_c-k_rand(1:length(spikefreq_up)))*1e6,spikefreq_down,'b');plot((stiffness_c-k_rand(1:length(spikefreq_up)))*1e6,sqrt((stiffness_c-k_rand(1:length(spikefreq_up)))*1e6),'b');
+plot((stiffness_c-kv(1:length(spikefreq_up)))*1e6,spikefreq_up,'r');hold on;plot((stiffness_c-kv(1:length(spikefreq_up)))*1e6,spikefreq_down,'b');plot((stiffness_c-kv(1:length(spikefreq_up)))*1e6,sqrt((stiffness_c-kv(1:length(spikefreq_up)))*1e6),'b');
 title('Red=up, blue=down');xlabel('Force (pN)');ylabel('Spike Frequency (spikes/sec)');
-plot((stiffness_c-k_rand(1:length(spikefreq_up)))*1e6,meanRT_up,'r');hold on;plot((stiffness_c-k_rand(1:length(spikefreq_up)))*1e6,meanRT_down,'b');
+plot((stiffness_c-kv(1:length(spikefreq_up)))*1e6,meanRT_up,'r');hold on;plot((stiffness_c-kv(1:length(spikefreq_up)))*1e6,meanRT_down,'b');
 title('Red=up, blue=down');xlabel('Force (pN)');ylabel('Mean Waiting Time (sec)');
 end
 
@@ -545,24 +548,24 @@ end
 if forces == 1
 figure;
 subplot(2,2,1);
-plot(F_rand,RTupexp_stat5,'r');hold on;plot(F_rand,RTdownexp_stat5,'b'); ylabel('Lillie(exp) Stat');title('Red=up, blue=down');
+plot(Fe,RTupexp_stat5,'r');hold on;plot(Fe,RTdownexp_stat5,'b'); ylabel('Lillie(exp) Stat');title('Red=up, blue=down');
 subplot(2,2,2);
-plot(F_rand,RTupgauss_stat5(1,:),'r');hold on;plot(F_rand,RTdowngauss_stat5(1,:),'b'); ylabel('Lillie(gauss) Stat');title('Red=up, blue=down');
+plot(Fe,RTupgauss_stat5(1,:),'r');hold on;plot(Fe,RTdowngauss_stat5(1,:),'b'); ylabel('Lillie(gauss) Stat');title('Red=up, blue=down');
 subplot(2,2,3);
-plot(F_rand,RTupgauss_stat5(2,:),'r');hold on;plot(F_rand,RTdowngauss_stat5(2,:),'b'); ylabel('JB Stat');title('Red=up, blue=down');
+plot(Fe,RTupgauss_stat5(2,:),'r');hold on;plot(Fe,RTdowngauss_stat5(2,:),'b'); ylabel('JB Stat');title('Red=up, blue=down');
 subplot(2,2,4);
-plot(F_rand,RTupgauss_stat5(3,:),'r');hold on;plot(F_rand,RTdowngauss_stat5(3,:),'b'); ylabel('KS Stat');title('Red=up, blue=down');
+plot(Fe,RTupgauss_stat5(3,:),'r');hold on;plot(Fe,RTdowngauss_stat5(3,:),'b'); ylabel('KS Stat');title('Red=up, blue=down');
 
 elseif stiffnesses == 1
 figure;
 subplot(2,2,1);
-plot(k_rand,RTupexp_stat5,'r');hold on;plot(k_rand,RTdownexp_stat5,'b'); ylabel('Lillie(exp) Stat');title('Red=up, blue=down');
+plot(kv,RTupexp_stat5,'r');hold on;plot(kv,RTdownexp_stat5,'b'); ylabel('Lillie(exp) Stat');title('Red=up, blue=down');
 subplot(2,2,2);
-plot(k_rand,RTupgauss_stat5(1,:),'r');hold on;plot(k_rand,RTdowngauss_stat5(1,:),'b'); ylabel('Lillie(gauss) Stat');title('Red=up, blue=down');
+plot(kv,RTupgauss_stat5(1,:),'r');hold on;plot(kv,RTdowngauss_stat5(1,:),'b'); ylabel('Lillie(gauss) Stat');title('Red=up, blue=down');
 subplot(2,2,3);
-plot(k_rand,RTupgauss_stat5(2,:),'r');hold on;plot(k_rand,RTdowngauss_stat5(2,:),'b'); ylabel('JB Stat');title('Red=up, blue=down');
+plot(kv,RTupgauss_stat5(2,:),'r');hold on;plot(kv,RTdowngauss_stat5(2,:),'b'); ylabel('JB Stat');title('Red=up, blue=down');
 subplot(2,2,4);
-plot(k_rand,RTupgauss_stat5(3,:),'r');hold on;plot(k_rand,RTdowngauss_stat5(3,:),'b'); ylabel('KS Stat');title('Red=up, blue=down');
+plot(kv,RTupgauss_stat5(3,:),'r');hold on;plot(kv,RTdowngauss_stat5(3,:),'b'); ylabel('KS Stat');title('Red=up, blue=down');
 
 end
 
@@ -571,15 +574,16 @@ figure;
 warning off
 for i = 1:length(poisswinmov_down5)
     for j = 1:5
+        warning off
         % Freedman-Diaconis Rule
         poissbinup(i) = 2*iqr(poisswinmov_up5{i}(:,j))*length(poisswinmov_up5{i}(:,j))^(-1/3); 
         poissbindown(i) = 2*iqr(poisswinmov_down5{i}(:,j))*length(poisswinmov_down5{i}(:,j))^(-1/3);
         nbinspoissup(i) = round((max(poisswinmov_up5{i}(:,j)) - min(poisswinmov_up5{i}(:,j)))/poissbinup(i));
         nbinspoissdown(i) = round((max(poisswinmov_down5{i}(:,j)) - min(poisswinmov_down5{i}(:,j)))/poissbindown(i));
-        if isnan(nbinspoissup(i)) == 1 || isinf(nbinspoissup(i)) == 1
+        if isnan(nbinspoissup(i)) == 1 || isinf(nbinspoissup(i)) == 1 || nbinspoissup(i) < 5
              nbinspoissup(i) = 5;
         end
-        if isnan(nbinspoissdown(i)) == 1 || isinf(nbinspoissdown(i)) == 1
+        if isnan(nbinspoissdown(i)) == 1 || isinf(nbinspoissdown(i)) == 1 || nbinspoissdown(i) < 5
              nbinspoissdown(i) = 5;
         end
         % Create
@@ -590,6 +594,12 @@ for i = 1:length(poisswinmov_down5)
         [poissfitdownD{i,j},poissfitdownPD{i,j}] = allfitdist(poisswinmov_down5{i}(:,j));
         set(0,'DefaultAxesColorOrder',autumn(5));
         % Use histogram information in a chi-squared goodness-of-fit test
+        if min(poisshistupb{i,j}) < 0
+            poisshistupb{i,j} = poisshistupb{i,j} - min(poisshistupb{i,j});
+        end
+        if min(poisshistdownb{i,j}) < 0
+            poisshistdownb{i,j} = poisshistdownb{i,j} - min(poisshistdownb{i,j});
+        end        
          n1 = sum(poisshistupa{i,j}); n2 = sum(poisshistdowna{i,j});
          pdup_poiss{i,j} = fitdist(poisshistupb{i,j}','Poisson','Frequency',poisshistupa{i,j}');
          pddown_poiss{i,j} = fitdist(poisshistdownb{i,j}','Poisson','Frequency',poisshistdowna{i,j}');
@@ -615,7 +625,7 @@ end
 
 
 disp('Saving...');
-save([prefix 'analyzeddata.mat'],'poisshistupa','poisshistupb','poisshistdowna','poisshistdownb','poissfitupD','poissfitdownD','RTupdistD','RTdowndistD','meanRT_up','meanRT_down','RTupexp_stat5','RTdownexp_stat5','RTupgauss_stat5','RTdowngauss_stat5','upt','downt','F_rand','k_rand','time','spikefreq_up','spikefreq_down','Poissupchi2gof_p','Poissupchi2gof_stat','Poissdownchi2gof_p','Poissupchi2gof_stat','RTupgausschi2gof_p','RTupgausschi2gof_stat','RTdowngausschi2gof_p','RTdowngausschi2gof_stat','RTupexpchi2gof_p','RTupexpchi2gof_stat','RTdownexpchi2gof_p','RTdownexpchi2gof_stat','upa','upb','downb','downa','poisshistupa','poisshistupb','poisshistdownb','poisshistdowna');
+save([prefix 'analyzeddata.mat'],'poisshistupa','poisshistupb','poisshistdowna','poisshistdownb','poissfitupD','poissfitdownD','RTupdistD','RTdowndistD','meanRT_up','meanRT_down','RTupexp_stat5','RTdownexp_stat5','RTupgauss_stat5','RTdowngauss_stat5','upt','downt','Fe','kv','time','spikefreq_up','spikefreq_down','Poissupchi2gof_p','Poissupchi2gof_stat','Poissdownchi2gof_p','Poissupchi2gof_stat','RTupgausschi2gof_p','RTupgausschi2gof_stat','RTdowngausschi2gof_p','RTdowngausschi2gof_stat','RTupexpchi2gof_p','RTupexpchi2gof_stat','RTdownexpchi2gof_p','RTdownexpchi2gof_stat','upa','upb','downb','downa','poisshistupa','poisshistupb','poisshistdownb','poisshistdowna');
 
 %% DISCONTINUED Method
 warning('DISCONTINUED METHOD');
