@@ -11,7 +11,7 @@
 function output = morris_lecar_gillespie2
 
 Nkvect = [1000]; % number of K+ channels
-iapp1 = 0:0.3:80; 
+iapp1 = 150:0.4:300; 
 
 output = cell(length(iapp1),1); % output cell array
 figure
@@ -55,11 +55,11 @@ t0 = 0;
 % other parameters
 vk=-84;vl=-60;vca=120;
 gk=8;gl=2;c=20;
-%gca=4.4;    % hopf
-gca=4;     % SNIC/homoclinic
+gca=4.4;    % hopf
+%gca=4;     % SNIC/homoclinic
 
-tstart = 0; % time to turn on stimulus
-tend = 5000; % time to end simulation
+tstart = 1000; % time to turn on stimulus
+tend = 11000; % time to end simulation
 dtmin = 0.1; % minimum step size
 
 i = 1;  % counter, updated with each stochastic transition
@@ -109,10 +109,10 @@ end
 end
 
 function winf = winf(v)
-%v3=2;           % hopf
-v3=12;          % SNIC/homoclinic
-%v4=30;          % hopf
-v4=17.4;        % SNIC/homoclinic
+v3=2;           % hopf
+%v3=12;          % SNIC/homoclinic
+v4=30;          % hopf
+%v4=17.4;        % SNIC/homoclinic
 winf=.5*(1+tanh((v-v3)/v4));
 end
 
@@ -122,12 +122,12 @@ minf = .5*(1+tanh((v-v1)/v2));
 end
 
 function tauw = tauw(v)
-%v3=2;           % hopf
-v3=12;          % SNIC/homoclinic
-%v4=30;          % hopf
-v4=17.4;        % SNIC/homoclinic
-%phi=0.04;       % hopf
-phi=0.067;     % SNIC
+v3=2;           % hopf
+%v3=12;          % SNIC/homoclinic
+v4=30;          % hopf
+%v4=17.4;        % SNIC/homoclinic
+phi=0.04;       % hopf
+%phi=0.067;     % SNIC
 %phi=0.23;      % homoclinic
 tauw = 1/phi/cosh((v-v3)/(2*v4)); % we include phi in tauw to make it easy to do stochastic calculations
 end
