@@ -1,11 +1,11 @@
 %% (1) DATA IMPORT
 
 % Import data
-file='';
-load(file);
+%file='/Users/joshsalvi/Desktop/SNICstochoutput.mat';
+%load(file);
 
 % Type of bifurcation
-biftype = 1;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+biftype = 2;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
 if biftype == 1
     Xdet1 = Hopfdet; Xsto1 = Hopfsto;
     clear i;
@@ -44,7 +44,7 @@ if analysisstep == 1
 tmin=tvec(0.1*length(tvec));
 tmax=tvec(end);
 minindex = find(abs(tvec-tmin)==min(abs(tvec-tmin)));
-maxindex = find(abs(tvec-tmax)==min(abs(tvec-tmax)));
+maxindex = find(abs(tvec-tmax)==min(abs(tvec-tmax)))-1;
 Ttotal = tmax-tmin;
 
 % Prepare to remove the mean from time traces
@@ -68,7 +68,7 @@ detmean = zeros(length(Xdet),length(Xdet{1}));
 stomean = zeros(length(Xdet),length(Xdet{1}));
 dethista = cell(length(Xdet),length(Xdet{1})); dethistb = cell(length(Xdet),length(Xdet{1}));
 stohista = cell(length(Xdet),length(Xdet{1})); stohistb = cell(length(Xdet),length(Xdet{1}));
-detvar = cell(length(Xdet),length(Xdet{1})); stovar = cell(length(Xdet),length(Xdet{1}));
+detvar = zeros(length(Xdet),length(Xdet{1})); stovar = zeros(length(Xdet),length(Xdet{1}));
 
 
 % Generate histograms and calculate statistics
@@ -105,8 +105,13 @@ for j = 1:length(Xdet)
         lowerdet = detmean(j,k) - Xdet{j}{k}(Xdet{j}{k} <= detmean(j,k));
         uppersto = Xsto{j}{k}(Xsto{j}{k} >= stomean(j,k)) - stomean(j,k);   
         lowersto = stomean(j,k) - Xsto{j}{k}(Xsto{j}{k} <= stomean(j,k));
-        upperdet = [upperdet' -uppderdet']';lowerdet = [lowerdet' -lowerdet']'; % symmetrize
+        if iscolumn(upperdet) == 1
+        upperdet = [upperdet' -upperdet']';lowerdet = [lowerdet' -lowerdet']'; % symmetrize
         uppersto = [uppersto' -uppersto']';lowersto = [lowersto' -lowersto']';
+        else
+        upperdet = [upperdet -upperdet]';lowerdet = [lowerdet -lowerdet]'; % symmetrize
+        uppersto = [uppersto -uppersto]';lowersto = [lowersto -lowersto]';
+        end
         [hsymmdet(j,k),psymmdet(j,k),KSstatdet(j,k)] = kstest2(upperdet,lowerdet,10^-2);    % kstest between the distributions
         [hsymmsto(j,k),psymmsto(j,k),KSstatsto(j,k)] = kstest2(uppersto,lowersto,10^-2);
         
