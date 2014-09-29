@@ -5,25 +5,25 @@
 %load(file);
 
 % Type of bifurcation
-biftype = 2;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+biftype = 3;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
 if biftype == 1
     Xdet1 = Hopfdet; Xsto1 = Hopfsto;
     clear i;
-    for j = 1:length(Xdet)
-        for k = 1:length(Xdet{1})
-            Xdet{j,k} = Xdet1{j,k}(1,:) + i*Xdet1{j,k}(2,:);
-            Xsto{j,k} = Xsto1{j,k}(1,:) + i*Xsto1{j,k}(2,:);
+    for j = 1:length(Xdet1)
+        for k = 1:length(Xdet1{1})
+            Xdet{j}{k} = Xdet1{j}{k}(1,:) + 1*Xdet1{j}{k}(2,:);
+            Xsto{j}{k} = Xsto1{j}{k}(1,:) + 1*Xsto1{j}{k}(2,:);
         end
     end
-    clear Xdet1 Xsto1
+    clear Xdet1 Xsto1 Hopfdet Hopfsto
 elseif biftype == 2
     Xdet = SNICdet; Xsto = SNICsto;
 elseif biftype == 3
     Xdet1 = Hopfsubdet; Xsto1 = Hopfsubsto;
-    for j = 1:length(Xdet)
-        for k = 1:length(Xdet{1})
-            Xdet{j,k} = Xdet1{j,k}(1,:).*sin(Xdet1{j,k}(2,:));
-            Xsto{j,k} = Xsto1{j,k}(1,:).*sin(Xsto1{j,k}(2,:));
+    for j = 1:length(Xdet1)
+        for k = 1:length(Xdet1{1})
+            Xdet{j}{k} = Xdet1{j}{k}(1,:).*sin(Xdet1{j}{k}(2,:));
+            Xsto{j}{k} = Xsto1{j}{k}(1,:).*sin(Xsto1{j}{k}(2,:));
         end
     end
     clear Xdet1 Xsto1
@@ -146,7 +146,7 @@ if analysisstep == 2
 % the above statistical tests)
 asymthresh = 0.06;      % threshold for asymmetry test (KS>thresh -> asymmetric)
 kurtthresh = -18;       % threshold for kurtosis (K<thresh -> fat)
-hartthresh = 0.02;       % threshold for unimodality (dip>thresh -> multimodal)
+hartthresh = 0.06;       % threshold for unimodality (dip>thresh -> multimodal)
 
 % Preallocate memory
 detincl = zeros(length(Xdet),length(Xdet{1}));detinclstat = zeros(length(Xdet),length(Xdet{1}));
@@ -160,22 +160,22 @@ for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
         % Check each of the three statistical tests and include those that
         % pass.
-        if KSstatdet(j,k) >= asymthresh(j,k) && psymmdet(j,k) <= 10^-2
+        if KSstatdet(j,k) <= asymthresh
             detincl(j,k) = detincl(j,k) + 1;
         end
-        if KSstatsto(j,k) >= asymthresh(j,k) && psymmsto(j,k) <= 10^-2
+        if KSstatsto(j,k) <= asymthresh
             stoincl(j,k) = stoincl(j,k) + 1;
         end
-        if Kstatdet(j,k) <= kurtthresh && pKdet(j,k) <= 10^-3   
+        if Kstatdet(j,k) <= kurtthresh  
             detincl(j,k) = detincl(j,k) + 1;
         end
-        if Kstatsto(j,k) <= kurtthresh && pKsto(j,k) <= 10^-3   
+        if Kstatsto(j,k) <= kurtthresh  
             stoincl(j,k) = stoincl(j,k) + 1;
         end
-        if dipdet(j,k) >= hartthresh && punidet(j,k) <= 10^-4
+        if dipdet(j,k) >= hartthresh
             detincl(j,k) = detincl(j,k) + 1;
         end
-        if dipsto(j,k) >= hartthresh && punisto(j,k) <= 10^-4
+        if dipsto(j,k) >= hartthresh
             stoincl(j,k) = stoincl(j,k) + 1;
         end
         detinclstat(j,k) = detincl(j,k); stoinclstat(j,k) = stoincl(j,k);
@@ -199,8 +199,19 @@ for j = 1:length(Xdet)
     end
 end
     
-detincl(detincl>1) = 1;
-stoincl(stoincl>1) = 1;
+% All indices equal to 1 are included and others are not. Ensure a simply
+% connected region.
+detincl(detincl>=1) = 1;
+stoincl(stoincl>=1) = 1;
+for j = 1:length(Xdet)
+    detind = find(diff(detincl(j,:))==1); stoind = find(diff(stoincl(j,:))==1);
+    if numel(detind)>0
+        detincl(j,detind(1):end) = 1; 
+    end
+    if numel(stoind)>0
+        stoincl(j,stoind(1):end) = 1;
+    end
+end
 
 analysisstep = 3;
 else
@@ -219,11 +230,11 @@ pksto = cell(length(Xdet),length(Xdet{1}));trsto = cell(length(Xdet),length(Xdet
 IEIpkdet = cell(length(Xdet),length(Xdet{1}));IEItrdet = cell(length(Xdet),length(Xdet{1}));
 IEIpksto = cell(length(Xdet),length(Xdet{1}));IEItrsto = cell(length(Xdet),length(Xdet{1}));
 
-NNerr = 10^-6   % error threshold for nearest-neighbor clustering
+NNerr = 10^-6;   % error threshold for nearest-neighbor clustering
 for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
         if detincl(j,k) == 1
-            [c1det(j,k),c2det(j,k)]=twoclass(Xdet{j}{k},NNerr);  % nearest-neighbor clustering
+            [c1det{j,k},c2det{j,k}]=twoclass(Xdet{j}{k},NNerr);  % nearest-neighbor clustering
             [pkdet{j,k},trdet{j,k}] = PTDetect(Xdet{j}{k}, max([c1det{j,k} c2det{j,k}]));
             for l = 2:length(pkdet{j,k})
                 IEIpkdet{j,k}(l-1) = (pkdet{j,k}(l) - pkdet{j,k}(l-1))/Fs;
@@ -236,7 +247,7 @@ for j = 1:length(Xdet)
             IEIpkdet{j,k} = 0; IEItrdet{j,k} = 0;
         end
         if stoincl(j,k) == 1
-            [c1sto(j,k),c2sto(j,k)]=twoclass(Xsto{j}{k},NNerr);  % nearest-neighbor clustering
+            [c1sto{j,k},c2sto{j,k}]=twoclass(Xsto{j}{k},NNerr);  % nearest-neighbor clustering
             [pksto{j,k},trsto{j,k}] = PTDetect(Xsto{j}{k}, max([c1sto{j,k} c2sto{j,k}]));
             for l = 2:length(pksto{j,k})
                 IEIpksto{j,k}(l-1) = (pksto{j,k}(l) - pksto{j,k}(l-1))/Fs;
@@ -302,11 +313,61 @@ if analysisstep == 4
 % sliding these windows, and counting the number of peaks within each
 % window (if the peaks are given as indices, simply step through different
 % number ranges and count the number of values within those index ranges.
+poisswin = round(0.0001*length(Xdet{1}{1}):(0.1*length(Xdet{1}{1})-0.001*length(Xdet{1}{1}))/9:0.1*length(Xdet{1}{1}));
 
-% Generate distributions from the above method.
+
+% Pre-allocate memory
+%cumsumdetpk = zeros(length(Xdet),length(Xdet{1}),length(poisswin));cumsumstopk = zeros(length(Xdet),length(Xdet{1}),length(poisswin));
+%cumsumdettr = zeros(length(Xdet),length(Xdet{1}),length(poisswin));cumsumstotr = zeros(length(Xdet),length(Xdet{1}),length(poisswin));
+
+for j = 1:length(Xdet)
+    for k = 1:length(Xdet{1})
+        Xdetpk{j}{k} = zeros(1,length(Xdet{1}{1}));Xstopk{j}{k} = zeros(1,length(Xdet{1}{1}));
+        Xdettr{j}{k} = zeros(1,length(Xdet{1}{1}));Xstotr{j}{k} = zeros(1,length(Xdet{1}{1}));
+        if length(pkdet{j,k})>1
+            Xdetpk{j}{k}(pkdet{j,k}) = 1;
+        end
+        if length(trdet{j,k})>1   
+            Xdettr{j}{k}(trdet{j,k}) = 1;
+        end 
+        if length(pksto{j,k})>1
+            Xstopk{j}{k}(pksto{j,k}) = 1;
+        end
+        if length(trdet{j,k})>1   
+            Xstotr{j}{k}(trsto{j,k}) = 1;
+        end
+        cumsumdetpk(j,k,:) = cumsum(Xdetpk{j}{k});
+        cumsumstopk(j,k,:) = cumsum(Xstopk{j}{k});
+        cumsumdettr(j,k,:) = cumsum(Xdetpk{j}{k});
+        cumsumstotr(j,k,:) = cumsum(Xstotr{j}{k});
+        for l = 1:length(poisswin)
+            numwindet = floor(length(Xdet{j}{k})/poisswin(l));
+            numwinsto = floor(length(Xsto{j}{k})/poisswin(l));
+            for m = 1:numwindet
+                poisscountsdetpk(j,k,l,m) = -cumsumdetpk(j,k,1+(m-1)*poisswin(l))+cumsumdetpk(j,k,m*poisswin(l));
+                poisscountsdettr(j,k,l,m) = -cumsumdettr(j,k,1+(m-1)*poisswin(l))+cumsumdettr(j,k,m*poisswin(l));
+            end
+            for m = 2:numwinsto
+                poisscountsstopk(j,k,l,m) = -cumsumstopk(j,k,1+(m-1)*poisswin(l))+cumsumstopk(j,k,m*poisswin(l));
+                poisscountsstotr(j,k,l,m) = -cumsumstotr(j,k,1+(m-1)*poisswin(l))+cumsumstotr(j,k,m*poisswin(l));                       
+            end
+        end
+    end
+end
+
 
 % Perform statistics on the distributions to see if they follow a Poisson
 % process.
+for j = 1:length(Xdet)
+    for k = 1:length(Xdet{1})
+        for l = 1:length(poisswin)
+            [poissHdetpk(j,k,l), poissPdetpk(j,k,l), poissSTATdetpk(j,k,l)] = chi2gof(poisscountsdetpk(j,k,l,:),'cdf',@(z)poisscdf(z,mean(poisscountsdetpk(j,k,l,:))),'nparams',1);
+            [poissHdettr(j,k,l), poissPdettr(j,k,l), poissSTATdettr(j,k,l)] = chi2gof(poisscountsdettr(j,k,l,:),'cdf',@(z)poisscdf(z,mean(poisscountsdettr(j,k,l,:))),'nparams',1);
+            [poissHstopk(j,k,l), poissPstopk(j,k,l), poissSTATstopk(j,k,l)] = chi2gof(poisscountsstopk(j,k,l,:),'cdf',@(z)poisscdf(z,mean(poisscountsstopk(j,k,l,:))),'nparams',1);
+            [poissHstotr(j,k,l), poissPstotr(j,k,l), poissSTATstotr(j,k,l)] = chi2gof(poisscountsstotr(j,k,l,:),'cdf',@(z)poisscdf(z,mean(poisscountsstotr(j,k,l,:))),'nparams',1);        
+        end
+    end
+end
 
 analysisstep = 5;
 else
