@@ -5,7 +5,7 @@
 %load(file);
 
 % Type of bifurcation
-biftype = 3;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+biftype = 2;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
 if biftype == 1
     Xdet1 = Hopfdet; Xsto1 = Hopfsto;
     clear i;
@@ -57,7 +57,7 @@ end
 %clear Xdet Xsto
 
 % Which sample would you like to analyze first?
-sample = 1;
+sample = 2;
 Xdet = Xdet2{sample};
 Xsto = Xsto2{sample};
 
@@ -168,14 +168,15 @@ else
 end
 
 
-%% (3) EXCLUDE SELECTED EXAMPLES        
+%% (3) EXCLUDE SELECTED EXAMPLES  
+analysisstep=2;
 if analysisstep == 2
     
 % Exclude cases that go unstable or remain at zero (including those that fail
 % the above statistical tests)
-asymthresh = 0.06;      % threshold for asymmetry test (KS>thresh -> asymmetric)
+asymthresh = 0.001;      % threshold for asymmetry test (KS>thresh -> asymmetric)
 kurtthresh = -18;       % threshold for kurtosis (K<thresh -> fat)
-hartthresh = 0.06;       % threshold for unimodality (dip>thresh -> multimodal)
+hartthresh = 0.02;       % threshold for unimodality (dip>thresh -> multimodal)
 
 % Preallocate memory
 detincl = zeros(length(Xdet),length(Xdet{1}));detinclstat = zeros(length(Xdet),length(Xdet{1}));
@@ -320,10 +321,10 @@ for j = 1:length(Xdet)
         CDdettr(j,k) = var(IEItrdet{j,k})/mean(IEItrdet{j,k});
         CDstopk(j,k) = var(IEIpksto{j,k})/mean(IEIpksto{j,k});
         CDstotr(j,k) = var(IEItrsto{j,k})/mean(IEItrsto{j,k});
-        pkdiffusiondet(j,k) = 0.5*CDdet(j,k)^2*pkspikeratedet(j,k); % diffusion coefficient, peaks
-        pkdiffusionsto(j,k) = 0.5*CDsto(j,k)^2*pkspikeratesto(j,k);
-        trdiffusiondet(j,k) = 0.5*CDdet(j,k)^2*trspikeratedet(j,k); % diffusion coefficient, troughs
-        trdiffusionsto(j,k) = 0.5*CDsto(j,k)^2*trspikeratesto(j,k);
+        pkdiffusiondet(j,k) = 0.5*CDdetpk(j,k)^2*pkspikeratedet(j,k); % diffusion coefficient, peaks
+        pkdiffusionsto(j,k) = 0.5*CDstopk(j,k)^2*pkspikeratesto(j,k);
+        trdiffusiondet(j,k) = 0.5*CDdettr(j,k)^2*trspikeratedet(j,k); % diffusion coefficient, troughs
+        trdiffusionsto(j,k) = 0.5*CDstotr(j,k)^2*trspikeratesto(j,k);
         pktcorrdet(j,k) = 0.5*pkdiffusiondet(j,k) - 1/pkspikeratedet(j,k);       % correlation time, peaks
         pktcorrsto(j,k) = 0.5*pkdiffusionsto(j,k) - 1/pkspikeratesto(j,k);
         trtcorrdet(j,k) = 0.5*trdiffusiondet(j,k) - 1/trspikeratedet(j,k);       % correlation time, troughs
@@ -498,6 +499,6 @@ end;clear i
 
 %% (X) SAVE DATA
 
-savefile='';    % New file
-savefile=file;  % Overwrite old file
-save(savefile);
+savefile='/Users/joshsalvi/Desktop/SNICstochoutput2-analyzed-1.mat';    % New file
+%savefile=file;  % Overwrite old file
+save(savefile,'-v7.3','I','detincl','stoincl','pkspikeratedet','pkspikeratesto','trspikeratedet','trspikeratedet','CDstopk','CDstotr','CDdetpk','CDdettr','pkdiffusiondet','pkdiffusionsto','trdiffusiondet','trdiffusionsto','pkIEIspikeratiodet','pkIEIspikeratiosto','trIEIspikeratiodet','trIEIspikeratiosto','noiselevel','poissPdetpk','poissPdettr','poissPstopk','poissPstotr');

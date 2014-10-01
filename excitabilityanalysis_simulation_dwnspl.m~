@@ -1,29 +1,38 @@
 %% (1) DATA IMPORT
 
+% Downsample rate
+dwnspl = 100;
+
+
 % Import data
 %file='/Users/joshsalvi/Desktop/SNICstochoutput.mat';
 %load(file);
 
 % Type of bifurcation
-biftype = 1;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+biftype = 2;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
 if biftype == 1
     Xdet1 = Hopfdet; Xsto1 = Hopfsto;
     clear i;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
-            Xdet{j}{k} = Xdet1{j}{k}(1,:) + 1*Xdet1{j}{k}(2,:);
-            Xsto{j}{k} = Xsto1{j}{k}(1,:) + 1*Xsto1{j}{k}(2,:);
+            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end) + 1*Xdet1{j}{k}(2,1:dwnspl:end);
+            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end) + 1*Xsto1{j}{k}(2,1:dwnspl:end);
         end
     end
     clear Xdet1 Xsto1 Hopfdet Hopfsto
 elseif biftype == 2
-    Xdet = SNICdet; Xsto = SNICsto;
+    for j = 1:length(SNICdet)
+        for k = 1:length(SNICdet{1})
+            Xdet{j}{k} = SNICdet{j}{k}(1:dwnspl:end);
+            Xsto{j}{k} = SNICsto{j}{k}(1:dwnspl:end);
+        end
+    end
 elseif biftype == 3
     Xdet1 = Hopfsubdet; Xsto1 = Hopfsubsto;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
-            Xdet{j}{k} = Xdet1{j}{k}(1,:).*sin(Xdet1{j}{k}(2,:));
-            Xsto{j}{k} = Xsto1{j}{k}(1,:).*sin(Xsto1{j}{k}(2,:));
+            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end).*sin(Xdet1{j}{k}(2,1:dwnspl:end));
+            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end).*sin(Xsto1{j}{k}(2,1:dwnspl:end));
         end
     end
     clear Xdet1 Xsto1
@@ -32,7 +41,7 @@ else
 end
 
 % Define time vector
-tvec=t;
+tvec=t(1:dwnspl:end);
 % Define the sample rate if not already done
 Fs=1/(tvec(2)-tvec(1));
 
@@ -57,7 +66,7 @@ end
 %clear Xdet Xsto
 
 % Which sample would you like to analyze first?
-sample = 2;
+sample = 5;
 Xdet = Xdet2{sample};
 Xsto = Xsto2{sample};
 
@@ -141,8 +150,8 @@ for j = 1:length(Xdet)
         upperdet = [upperdet -upperdet]';lowerdet = [lowerdet -lowerdet]'; % symmetrize
         uppersto = [uppersto -uppersto]';lowersto = [lowersto -lowersto]';
         end
-        [hsymmdet(j,k),psymmdet(j,k),KSstatdet(j,k)] = kstest2(upperdet,lowerdet,10^-2);    % kstest between the distributions
-        [hsymmsto(j,k),psymmsto(j,k),KSstatsto(j,k)] = kstest2(uppersto,lowersto,10^-2);
+        [hsymmdet(j,k),psymmdet(j,k),KSstatdet(j,k)] = kstest2(upperdet,lowerdet(1,:),10^-2);    % kstest between the distributions
+        [hsymmsto(j,k),psymmsto(j,k),KSstatsto(j,k)] = kstest2(uppersto,lowersto(1,:),10^-2);
         
         % Kurtosis test, Reference: Basic Statistics for Social Research (1997)
         NK = length(Xdet{j}{k});
@@ -174,9 +183,9 @@ if analysisstep == 2
     
 % Exclude cases that go unstable or remain at zero (including those that fail
 % the above statistical tests)
-asymthresh = 0.004;      % threshold for asymmetry test (KS>thresh -> asymmetric)
+asymthresh = 0.001;      % threshold for asymmetry test (KS>thresh -> asymmetric)
 kurtthresh = -18;       % threshold for kurtosis (K<thresh -> fat)
-hartthresh = 0.1;       % threshold for unimodality (dip>thresh -> multimodal)
+hartthresh = 0.018;       % threshold for unimodality (dip>thresh -> multimodal)
 
 % Preallocate memory
 detincl = zeros(length(Xdet),length(Xdet{1}));detinclstat = zeros(length(Xdet),length(Xdet{1}));
@@ -186,7 +195,7 @@ stoincl = zeros(length(Xdet),length(Xdet{1}));stoinclstat = zeros(length(Xdet),l
 % passes (multimodal/fat/asymmetric). If zero, the point is quiescent.
 % detincl/stoincl are the operating points that will be included in future
 % analyses.
-for j = length(Xdet)
+for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
         % Check each of the three statistical tests and include those that
         % pass.
@@ -233,7 +242,7 @@ end
 % connected region.
 detincl(detincl>=1) = 1;
 stoincl(stoincl>=1) = 1;
-for j = length(Xdet)
+for j = 1:length(Xdet)
     detind = find(diff(detincl(j,:))==1); stoind = find(diff(stoincl(j,:))==1);
     if numel(detind)>0
         detincl(j,detind(1):end) = 1; 
@@ -261,7 +270,7 @@ IEIpkdet = cell(length(Xdet),length(Xdet{1}));IEItrdet = cell(length(Xdet),lengt
 IEIpksto = cell(length(Xdet),length(Xdet{1}));IEItrsto = cell(length(Xdet),length(Xdet{1}));
 
 NNerr = 10^-6;   % error threshold for nearest-neighbor clustering
-for j = length(Xdet)
+for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
         if detincl(j,k) == 1
             [c1det{j,k},c2det{j,k}]=twoclass(Xdet{j}{k},NNerr);  % nearest-neighbor clustering
@@ -309,7 +318,7 @@ trIEIspikeratiodet = zeros(length(Xdet),length(Xdet{1}));trIEIspikeratiosto = ze
 
 % Calculate statistics: coefficient of dispersion, spike rate, diffusion
 % coefficient, correlation time
-for j = length(Xdet)
+for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
         pkspikeratedet(j,k) = length(pkdet{j,k})/Ttotal;      % spike rate, peaks
         pkspikeratesto(j,k) = length(pksto{j,k})/Ttotal;
@@ -499,6 +508,6 @@ end;clear i
 
 %% (X) SAVE DATA
 
-savefile='/Users/joshsalvi/Desktop/SNICstochoutput2-analyzed-1.mat';    % New file
+savefile='/Users/joshsalvi/Desktop/SNICstochoutput2-analyzed-4.mat';    % New file
 %savefile=file;  % Overwrite old file
-save(savefile,'-v7.3','I','detincl','stoincl','pkspikeratedet','pkspikeratesto','trspikeratedet','trspikeratedet','CDstopk','CDstotr','CDdetpk','CDdettr','pkdiffusiondet','pkdiffusionsto','trdiffusiondet','trdiffusionsto','pkIEIspikeratiodet','pkIEIspikeratiosto','trIEIspikeratiodet','trIEIspikeratiosto','noiselevel','poissPdetpk','poissPdettr','poissPstopk','poissPstotr');
+save(savefile,'-v7.3','I','detincl','stoincl','pkspikeratedet','pkspikeratesto','trspikeratedet','trspikeratedet','CDstopk','CDstotr','CDdetpk','CDdettr','pkdiffusiondet','pkdiffusionsto','trdiffusiondet','trdiffusionsto','pkIEIspikeratiodet','pkIEIspikeratiosto','trIEIspikeratiodet','trIEIspikeratiosto','noiselevel');
