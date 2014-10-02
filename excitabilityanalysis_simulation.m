@@ -5,7 +5,7 @@
 %load(file);
 
 % Type of bifurcation
-biftype = 2;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+biftype = 1;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
 if biftype == 1
     Xdet1 = Hopfdet; Xsto1 = Hopfsto;
     clear i;
@@ -273,8 +273,16 @@ for j = 1:length(Xdet)
                 IEItrdet{j,k}(l-1) = (trdet{j,k}(l) - trdet{j,k}(l-1))/Fs;
             end
         else
-            pkdet{j,k} = 0; trdet{j,k} = 0;
-            IEIpkdet{j,k} = 0; IEItrdet{j,k} = 0;
+            [c1det{j,k},c2det{j,k}]=twoclass(Xdet{j}{k},NNerr);  % nearest-neighbor clustering
+            [pkdet{j,k},trdet{j,k}] = PTDetect(Xdet{j}{k}, max([c1det{j,k} c2det{j,k}]));
+            for l = 2:length(pkdet{j,k})
+                IEIpkdet{j,k}(l-1) = (pkdet{j,k}(l) - pkdet{j,k}(l-1))/Fs;
+            end
+            for l = 2:length(trdet{j,k})
+                IEItrdet{j,k}(l-1) = (trdet{j,k}(l) - trdet{j,k}(l-1))/Fs;
+            end
+            %pkdet{j,k} = 0; trdet{j,k} = 0;
+            %IEIpkdet{j,k} = 0; IEItrdet{j,k} = 0;
         end
         if stoincl(j,k) == 1
             [c1sto{j,k},c2sto{j,k}]=twoclass(Xsto{j}{k},NNerr);  % nearest-neighbor clustering
@@ -286,8 +294,16 @@ for j = 1:length(Xdet)
                 IEItrsto{j,k}(l-1) = (trsto{j,k}(l) - trsto{j,k}(l-1))/Fs;
             end
         else
-            pksto{j,k} = 0; trsto{j,k} = 0;
-            IEIpksto{j,k} = 0; IEItrsto{j,k} = 0;
+            %pksto{j,k} = 0; trsto{j,k} = 0;
+            %IEIpksto{j,k} = 0; IEItrsto{j,k} = 0;
+            [c1sto{j,k},c2sto{j,k}]=twoclass(Xsto{j}{k},NNerr);  % nearest-neighbor clustering
+            [pksto{j,k},trsto{j,k}] = PTDetect(Xsto{j}{k}, max([c1sto{j,k} c2sto{j,k}]));
+            for l = 2:length(pksto{j,k})
+                IEIpksto{j,k}(l-1) = (pksto{j,k}(l) - pksto{j,k}(l-1))/Fs;
+            end
+            for l = 2:length(trsto{j,k})
+                IEItrsto{j,k}(l-1) = (trsto{j,k}(l) - trsto{j,k}(l-1))/Fs;
+            end
         end
     end
 end
@@ -369,7 +385,7 @@ for j = 1:length(Xdet)
         if length(pksto{j,k})>1
             Xstopk{j}{k}(pksto{j,k}) = 1;
         end
-        if length(trdet{j,k})>1   
+        if length(trsto{j,k})>1   
             Xstotr{j}{k}(trsto{j,k}) = 1;
         end
         cumsumdetpk(j,k,:) = cumsum(Xdetpk{j}{k});
@@ -428,6 +444,17 @@ if analysisstep == 5
 % of coherence by taking the ratio of the peak height to the width at which
 % the spectrum decays to sqrt(2) of its peak (S(wmax)/[dW/wmax]).
 
+% Find peaks in power spectra.
+for j = 1:length(Xdet)
+    for k = 1:length(Xdet{1})
+        [pxxdet,fdet]=pwelch(Xdet{j}{k},[],[],[],Fs);
+        [pxxsto,fsto]=pwelch(Xsto{j}{k},[],[],[],Fs);
+        PSDdetpk_ampl(j,k)=pxxdet(pxxdet==max(pxxdet));
+        PSDdetpk_freq(j,k)=fdet(pxxdet==max(pxxdet));
+        PSDstopk_ampl(j,k)=pxxsto(pxxsto==max(pxxsto));
+        PSDstopk_freq(j,k)=fsto(pxxsto==max(pxxsto));
+    end
+end
 analysisstep = 6;
 else
     disp('Run previous cell.');
