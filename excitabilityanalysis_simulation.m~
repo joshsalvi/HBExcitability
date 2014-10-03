@@ -19,7 +19,7 @@ if biftype == 1
 elseif biftype == 2
     Xdet = SNICdet; Xsto = SNICsto;
 elseif biftype == 3
-    Xdet1 = Xdet; Xsto1 = Xdet;
+    Xdet1 = Hopfsubdet; Xsto1 = Hopfsubsto;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
             Xdet{j}{k} = Xdet1{j}{k}(1,:).*sin(Xdet1{j}{k}(2,:));
@@ -522,6 +522,17 @@ figure(9);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(pk
 figure(10);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(trIEIspikeratiodet(i,:)) max(trIEIspikeratiodet(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(trIEIspikeratiodet(i,:)) max(trIEIspikeratiodet(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,trIEIspikeratiodet(i,:),'k--');plot(I,trIEIspikeratiosto(i,:),'r');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('MeanIEI/(1/spikerate)');
 end;clear i
 
+for i = 1:6
+    detinclind = find(detincl(i,:)==0); detinclind=detinclind(end);
+    stoinclind = find(stoincl(i,:)==0); 
+    if length(stoinclind) > 1
+        stoinclind=stoinclind(end);
+    else
+        stoinclind=1;
+    end
+figure(11);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(PSDdetpk_ampl(i,:)) max(PSDdetpk_ampl(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(PSDdetpk_ampl(i,:)) max(PSDdetpk_ampl(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,PSDdetpk_ampl(i,:),'k--');plot(I,PSDstopk_ampl(i,:),'r');title(sprintf('%s%s %s%s','Peaks, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('MeanIEI/(1/spikerate)');
+figure(12);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(PSDdetpk_freq(i,:)) max(PSDdetpk_freq(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(PSDdetpk_freq(i,:)) max(PSDdetpk_freq(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,PSDdetpk_freq(i,:),'k--');plot(I,PSDstopk_amp(i,:),'r');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('MeanIEI/(1/spikerate)');
+end;clear i
 
 
 %% (X) SAVE DATA

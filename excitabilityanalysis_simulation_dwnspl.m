@@ -9,7 +9,7 @@ dwnspl = 10;
 %load(file);
 
 % Type of bifurcation
-biftype = 2;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+biftype = 1;        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
 if biftype == 1
     Xdet1 = Hopfdet; Xsto1 = Hopfsto;
     clear i;
@@ -28,7 +28,7 @@ elseif biftype == 2
         end
     end
 elseif biftype == 3
-    Xdet1 = Hopfsubdet; Xsto1 = Hopfsubsto;
+    Xdet1 = Xdet; Xsto1 = Xsto;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
             Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end).*sin(Xdet1{j}{k}(2,1:dwnspl:end));
@@ -470,11 +470,26 @@ else
     disp('Run previous cell.');
 end
 %% (7) PLOT DATA
-biftype2='SNIC';
+if biftype == 1
+    biftype2='supercritical Hopf';
+elseif biftype == 2
+    biftype2='SNIC';
+elseif biftype == 3
+    biftype2='subcritical Hopf';
+end
 
-for i = 1:6
-    detinclind = find(detincl(i,:)==0); detinclind=detinclind(end);
+if biftype == 1 || biftype == 3
+    I = mu;
+end
+
+for i = 1:length(Xdet)
+    detinclind = find(detincl(i,:)==0); 
     stoinclind = find(stoincl(i,:)==0); 
+    if length(detinclind) > 1
+        detinclind=detinclind(end);
+    else
+        detinclind=1;
+    end
     if length(stoinclind) > 1
         stoinclind=stoinclind(end);
     else
@@ -484,9 +499,14 @@ figure(1);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(pk
 figure(2);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(pkspikeratedet(i,:)) max(pkspikeratedet(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(pkspikeratedet(i,:)) max(pkspikeratedet(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('Quiescent Region');
 end;clear i
 
-for i = 1:6
-    detinclind = find(detincl(i,:)==0); detinclind=detinclind(end);
+for i = 1:length(Xdet)
+    detinclind = find(detincl(i,:)==0); 
     stoinclind = find(stoincl(i,:)==0); 
+    if length(detinclind) > 1
+        detinclind=detinclind(end);
+    else
+        detinclind=1;
+    end
     if length(stoinclind) > 1
         stoinclind=stoinclind(end);
     else
@@ -496,9 +516,14 @@ figure(3);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 1 1 0]
 figure(4);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 1 1 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 1 1 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,trspikeratedet(i,:),'k--');hold on;plot(I,trspikeratesto(i,:),'r');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('Spike Rate');
 end;clear i
 
-for i = 1:6
-    detinclind = find(detincl(i,:)==0); detinclind=detinclind(end);
+for i = 1:length(Xdet)
+    detinclind = find(detincl(i,:)==0); 
     stoinclind = find(stoincl(i,:)==0); 
+    if length(detinclind) > 1
+        detinclind=detinclind(end);
+    else
+        detinclind=1;
+    end
     if length(stoinclind) > 1
         stoinclind=stoinclind(end);
     else
@@ -508,9 +533,14 @@ figure(5);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(CD
 figure(6);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(CDstotr(i,:)) max(CDstotr(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(CDstotr(i,:)) max(CDstotr(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,CDdettr(i,:),'k--');plot(I,CDstotr(i,:),'r');plot(I,ones(1,length(I)),'g--');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('Coeff. Dispersion');
 end;clear i
 
-for i = 1:6
-    detinclind = find(detincl(i,:)==0); detinclind=detinclind(end);
+for i = 1:length(Xdet)
+    detinclind = find(detincl(i,:)==0); 
     stoinclind = find(stoincl(i,:)==0); 
+    if length(detinclind) > 1
+        detinclind=detinclind(end);
+    else
+        detinclind=1;
+    end
     if length(stoinclind) > 1
         stoinclind=stoinclind(end);
     else
@@ -520,9 +550,14 @@ figure(7);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(pk
 figure(8);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(trdiffusiondet(i,:)) max(trdiffusiondet(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(trdiffusiondet(i,:)) max(trdiffusiondet(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,trdiffusiondet(i,:),'k--');plot(I,trdiffusionsto(i,:),'r');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('Diffusion Coeff.');
 end;clear i
 
-for i = 1:6
-    detinclind = find(detincl(i,:)==0); detinclind=detinclind(end);
+for i = 1:length(Xdet)
+    detinclind = find(detincl(i,:)==0); 
     stoinclind = find(stoincl(i,:)==0); 
+    if length(detinclind) > 1
+        detinclind=detinclind(end);
+    else
+        detinclind=1;
+    end
     if length(stoinclind) > 1
         stoinclind=stoinclind(end);
     else
@@ -532,7 +567,24 @@ figure(9);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(pk
 figure(10);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(trIEIspikeratiodet(i,:)) max(trIEIspikeratiodet(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(trIEIspikeratiodet(i,:)) max(trIEIspikeratiodet(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,trIEIspikeratiodet(i,:),'k--');plot(I,trIEIspikeratiosto(i,:),'r');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('MeanIEI/(1/spikerate)');
 end;clear i
 
+for i = 1:length(Xdet)
+    detinclind = find(detincl(i,:)==0); 
+    stoinclind = find(stoincl(i,:)==0); 
+    if length(detinclind) > 1
+        detinclind=detinclind(end);
+    else
+        detinclind=1;
+    end
+    if length(stoinclind) > 1
+        stoinclind=stoinclind(end);
+    else
+        stoinclind=1;
+    end
+figure(11);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(PSDdetpk_ampl(i,:)) max(PSDdetpk_ampl(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(PSDdetpk_ampl(i,:)) max(PSDdetpk_ampl(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,PSDdetpk_ampl(i,:),'k--');plot(I,PSDstopk_ampl(i,:),'r');title(sprintf('%s%s %s%s','Peaks, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('PSD Peak (amplitude)');
+figure(12);subplot(3,2,i);patch([I(1) I(1) I(detinclind) I(detinclind)],[0 max(PSDdetpk_freq(i,:)) max(PSDdetpk_freq(i,:)) 0],[0.85 0.85 0.85],'EdgeColor','none');hold on;patch([I(1) I(1) I(stoinclind) I(stoinclind)],[0 max(PSDdetpk_freq(i,:)) max(PSDdetpk_freq(i,:)) 0],[0.6 0.3 0.3],'EdgeColor','none');plot(I,PSDdetpk_freq(i,:),'k--');plot(I,PSDstopk_freq(i,:),'r');title(sprintf('%s%s %s%s','Troughs, ',biftype2,' Noise level = ',num2str(noiselevel(i))));xlabel('I');ylabel('PSD Peak (frequency)');
+end;clear i
 
+clear I
 
 %% (X) SAVE DATA
 
