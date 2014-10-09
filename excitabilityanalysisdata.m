@@ -25,14 +25,14 @@ load(sprintf('%s%s',filepath,importfile.name));
 
 % Downsample data
 for j = 1:a
-    for i = 1:(logdata.data(1,1))
-        Xd_dwnspl{i}{j} = Xd(1:dwnspl:end,i,j);
+    for i = 1:(logdata.data(1,8))
+        Xd_dwnspl{i}{j} = Xd(1:dwnspl:length(Xd),i,j);
         Xd_dwnspl{i}{j} = Xd_dwnspl{i}{j} - smooth(Xd_dwnspl{i}{j},length(Xd_dwnspl{i}{j})/10)+offset;
     end
 end
 
 % Define time vector
-tvec=time(1:dwnspl:end);
+tvec=time(1:dwnspl:length(time));
 clear time;
 % Define the sample rate if not already done
 Fs=1/(tvec(2)-tvec(1))*1e3;
@@ -71,7 +71,7 @@ detvar = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 
 % Generate histograms and calculate statistics
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         Xd_dwnspl{j}{k} = bsxfun(@minus, Xd_dwnspl{j}{k}, mean(Xd_dwnspl{j}{k}(minindex:maxindex)));
         [dethista{j,k}, dethistb{j,k}] = hist(Xd_dwnspl{j}{k},freedmandiaconis(Xd_dwnspl{j}{k}));
         bincount = sum(dethista{j,k}); dethista{j,k} = dethista{j,k}./bincount;
@@ -90,9 +90,11 @@ punidet = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 Xlowdet = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 Xupdet = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 
+
+%{
 % Perform three statistical tests on histograms
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         
         % Symmetry test [Asai '06]
         upperdet = Xd_dwnspl{j}{k}(Xd_dwnspl{j}{k} >= detmean(j,k)) - detmean(j,k);   % divide the distributions
@@ -120,23 +122,23 @@ for k = 1:a
     end
 end
 
-
     
 % Exclude cases that go unstable or remain at zero (including those that fail
 % the above statistical tests)
 asymthresh = 0.0001;      % threshold for asymmetry test (KS>thresh -> asymmetric)
 kurtthresh = -18;       % threshold for kurtosis (K<thresh -> fat)
 hartthresh = 0.008;       % threshold for unimodality (dip>thresh -> multimodal)
-
+%}
 % Preallocate memory
 detincl = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));detinclstat = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 
+%{
 % detinclstat/stoinclstat correspond to the number of tests that particular point
 % passes (multimodal/fat/asymmetric). If zero, the point is quiescent.
 % detincl/stoincl are the operating points that will be included in future
 % analyses.
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         % Check each of the three statistical tests and include those that
         % pass.
         if KSstatdet(j,k) <= asymthresh
@@ -171,7 +173,7 @@ for k = 1:a
         detincl(j,detind(1):end) = 1; 
     end
 end
-
+%}
 
 % Nearest-neighbor clustering and peak finding
 
@@ -182,10 +184,10 @@ IEIpkdet = cell(length(Xd_dwnspl),length(Xd_dwnspl{1}));IEItrdet = cell(length(X
 
 NNerr = 10^-6;   % error threshold for nearest-neighbor clustering
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
-        if detincl(j,k) == 1
-            [c1det{j,k},c2det{j,k}]=twoclass(Xd_dwnspl{j}{k},NNerr);  % nearest-neighbor clustering
-            [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, max([c1det{j,k} c2det{j,k}]));
+    for j = 1:(logdata.data(1,8))
+        if j == 1 && k == 1
+            [c1det,c2det]=twoclass(Xd_dwnspl{j}{k},NNerr);  % nearest-neighbor clustering
+            [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, max([c1det c2det]));
             for l = 2:length(pkdet{j,k})
                 IEIpkdet{j,k}(l-1) = (pkdet{j,k}(l) - pkdet{j,k}(l-1))/Fs;
             end
@@ -193,8 +195,7 @@ for k = 1:a
                 IEItrdet{j,k}(l-1) = (trdet{j,k}(l) - trdet{j,k}(l-1))/Fs;
             end
         else
-            [c1det{j,k},c2det{j,k}]=twoclass(Xd_dwnspl{j}{k},NNerr);  % nearest-neighbor clustering
-            [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, max([c1det{j,k} c2det{j,k}]));
+            [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, max([c1det c2det]));
             for l = 2:length(pkdet{j,k})
                 IEIpkdet{j,k}(l-1) = (pkdet{j,k}(l) - pkdet{j,k}(l-1))/Fs;
             end
@@ -225,7 +226,7 @@ trIEIspikeratiodet = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 % Calculate statistics: coefficient of dispersion, spike rate, diffusion
 % coefficient, correlation time
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         pkspikeratedet(j,k) = length(pkdet{j,k})/Ttotal*1e3;      % spike rate, peaks
         trspikeratedet(j,k) = length(trdet{j,k})/Ttotal*1e3;      % spike rate, troughs
         CDdettime(j,k) = detvar(j,k)/detmean(j,k);        % coefficient of dispersion
@@ -255,7 +256,7 @@ clear poisscountsdetpk poisscountsstopk poisscountsdettr poisscountsstotr
 %cumsumdettr = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}),length(poisswin));cumsumstotr = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}),length(poisswin));
 
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         Xd_dwnsplpk{j}{k} = zeros(1,length(Xd_dwnspl{1}{1}));
         Xd_dwnspltr{j}{k} = zeros(1,length(Xd_dwnspl{1}{1}));
         if length(pkdet{j,k})>1
@@ -282,7 +283,7 @@ end
 % Perform statistics on the distributions to see if they follow a Poisson
 % process.
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         for l = 1:length(poisswin)
            warning off
            [poissHdetpk{j,k,l}, poissPdetpk(j,k,l), poissSTATdetpk{j,k,l}] = chi2gof(squeeze(poisscountsdetpk{j,k,l}),'cdf',@(z)poisscdf(z,mean(squeeze(poisscountsdetpk{j,k,l}))),'nparams',1);
@@ -309,7 +310,7 @@ end
 
 % Find peaks in power spectra.
 for k = 1:a
-    for j = 1:(logdata.data(1,1))
+    for j = 1:(logdata.data(1,8))
         [pxXd_dwnspl,fdet]=pwelch(Xd_dwnspl{j}{k},[],[],[],Fs);
         PSDdetpk_ampl(j,k)=pxXd_dwnspl(pxXd_dwnspl==max(pxXd_dwnspl));
         PSDdetpk_freq(j,k)=fdet(pxXd_dwnspl==max(pxXd_dwnspl));
