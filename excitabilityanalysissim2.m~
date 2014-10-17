@@ -1,15 +1,15 @@
-function [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim(filename,dwnspl,biftype,c12constrain,offset,saveyn)
+function [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
 % This function imports simulation data and performs a peak-finding algorithm
 % analysis. 
 %
-% excitabilityanalysissim(filename,dwnspl,biftype,c12constrain)
+% [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
 % 
-% Ex. excitabilityanalysissim('/Users/joshsalvi/Desktop/Hopf/Hopfstochoutput4-finemu-analyzed-dwnspl10.mat',10,1,1)
+% Ex. excitabilityanalysissim2('/Users/joshsalvi/Desktop/Hopf/Hopfstochoutput4-finemu-analyzed-dwnspl10.mat',10,1,1)
 %
 % filename: name of MAT file with directory
 % dwnspl: downsampling rate
 % biftype: 1=supercritical Hopf, 2=SNIC, 3=subcritical Hopf
-% c12constrain: index of threshold from twoclass
+% c12thresh: manual threshold for peak detection
 %
 %
 % jsalvi@rockefeller.edu
@@ -28,8 +28,8 @@ if biftype == 1
     clear i;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
-            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end) + offset;  % use only real part
-            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end) + offset;
+            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end) + 1*Xdet1{j}{k}(2,1:dwnspl:end) + offset;
+            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end) + 1*Xsto1{j}{k}(2,1:dwnspl:end) + offset;
         end
     end
     clear Xdet1 Xsto1 Hopfdet Hopfsto
@@ -88,20 +88,20 @@ for j = 1:length(Xdet)
     end
 end
 
-
 % Nearest-neighbor clustering and peak finding
 
 % Preallocate memory
+c1det = cell(length(Xdet),length(Xdet{1}));c2det = cell(length(Xdet),length(Xdet{1}));
 pkdet = cell(length(Xdet),length(Xdet{1}));trdet = cell(length(Xdet),length(Xdet{1}));
+c1sto = cell(length(Xdet),length(Xdet{1}));c2sto = cell(length(Xdet),length(Xdet{1}));
 pksto = cell(length(Xdet),length(Xdet{1}));trsto = cell(length(Xdet),length(Xdet{1}));
 IEIpkdet = cell(length(Xdet),length(Xdet{1}));IEItrdet = cell(length(Xdet),length(Xdet{1}));
 IEIpksto = cell(length(Xdet),length(Xdet{1}));IEItrsto = cell(length(Xdet),length(Xdet{1}));
 
 NNerr = 10^-6;   % error threshold for nearest-neighbor clustering
 for j = 1:length(Xdet)
-    [c1det,c2det]=twoclass(Xdet{1}{c12constrain},NNerr);  % nearest-neighbor clustering
     for k = 1:length(Xdet{1})
-            [pkdet{j,k},trdet{j,k}] = PTDetect(Xdet{j}{k}, max([c1det c2det]));
+            [pkdet{j,k},trdet{j,k}] = PTDetect(Xdet{j}{k}, c12thresh);
             for l = 2:length(pkdet{j,k})
                 IEIpkdet{j,k}(l-1) = (pkdet{j,k}(l) - pkdet{j,k}(l-1))/Fs;
             end
@@ -109,7 +109,7 @@ for j = 1:length(Xdet)
                 IEItrdet{j,k}(l-1) = (trdet{j,k}(l) - trdet{j,k}(l-1))/Fs;
             end
             
-            [pksto{j,k},trsto{j,k}] = PTDetect(Xsto{j}{k}, max([c1det c2det]));
+            [pksto{j,k},trsto{j,k}] = PTDetect(Xsto{j}{k}, c12thresh);
             for l = 2:length(pksto{j,k})
                 IEIpksto{j,k}(l-1) = (pksto{j,k}(l) - pksto{j,k}(l-1))/Fs;
             end
@@ -172,12 +172,12 @@ for j = 1:length(Xdet)
         trIEIspikeratiosto(j,k) = meanIEItrsto(j,k)*trspikeratesto(j,k);
     end
 end
-if saveyn==1
+
+if saveyn == 1
     disp('Saving...');
-filename2 = filename(1:end-4);
-save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12constrain),'-biftype',num2str(biftype),'.mat'))
-disp('Finished.');
+    filename2 = filename(1:end-4);
+    save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12thresh),'-biftype',num2str(biftype),'.mat'))
+    disp('Finished.');
 else
     disp('Not saved.');
-end
 end

@@ -32,7 +32,7 @@ function [Xdet, Xsto, Fext] = thetamodelpulse(I,thetaNoiseSTD,tvec,Fextmax,pulse
 %
 
 % Initial condition
-thetazero = 1;
+thetazero = -0.0001;
 
 % Add external forcing if desired
 sinusoidalstim = 0; pulsestim = 1;  % pulse or sinusoid?
@@ -90,7 +90,7 @@ Xdet=Xdet-mean(Xdet);
 Xsto=Xsto-mean(Xsto);
 
 % Make a plot of the data?
-plotyn=0;
+plotyn=1;
 
 if plotyn==1
     figure;

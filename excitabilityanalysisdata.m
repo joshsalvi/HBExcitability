@@ -26,8 +26,9 @@ load(sprintf('%s%s',filepath,importfile.name));
 % Downsample data
 for j = 1:a
     for i = 1:(logdata.data(1,8))
-        Xd_dwnspl{i}{j} = Xd(1:dwnspl:length(Xd),i,j);
-        Xd_dwnspl{i}{j} = Xd_dwnspl{i}{j} - smooth(Xd_dwnspl{i}{j},length(Xd_dwnspl{i}{j})/10)+offset;
+        Xd_dwnspl{i}{j} = Xd(1:dwnspl:length(Xd),i,j);  % downsample
+        Xd(:,i,j) = Xd(:,i,j) - smooth(Xd(:,i,j),length(Xd(:,i,j))) + offset;   % remove drift
+        Xd_dwnspl{i}{j} = Xd_dwnspl{i}{j} - smooth(Xd_dwnspl{i}{j},length(Xd_dwnspl{i}{j})/10) + offset;    % remove drift
     end
 end
 

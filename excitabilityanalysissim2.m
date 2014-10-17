@@ -1,8 +1,8 @@
-function excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh)
+function [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
 % This function imports simulation data and performs a peak-finding algorithm
 % analysis. 
 %
-% excitabilityanalysissim(filename,dwnspl,biftype,c12constrain)
+% [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
 % 
 % Ex. excitabilityanalysissim2('/Users/joshsalvi/Desktop/Hopf/Hopfstochoutput4-finemu-analyzed-dwnspl10.mat',10,1,1)
 %
@@ -28,25 +28,25 @@ if biftype == 1
     clear i;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
-            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end) + 1*Xdet1{j}{k}(2,1:dwnspl:end);
-            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end) + 1*Xsto1{j}{k}(2,1:dwnspl:end);
+            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end) + offset;  % use only real part
+            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end) + offset;
         end
     end
     clear Xdet1 Xsto1 Hopfdet Hopfsto
 elseif biftype == 2
-    for j = 1:length(SNICdet)
-        for k = 1:length(SNICdet{1})
+    for j = 1:length(Xdet)
+        for k = 1:length(Xdet{1})
             SNICdet=Xdet;SNICsto=Xsto;
-            Xdet{j}{k} = SNICdet{j}{k}(1:dwnspl:end);
-            Xsto{j}{k} = SNICsto{j}{k}(1:dwnspl:end);
+            Xdet{j}{k} = SNICdet{j}{k}(1:dwnspl:end) + offset;
+            Xsto{j}{k} = SNICsto{j}{k}(1:dwnspl:end) + offset;
         end
     end
 elseif biftype == 3
     Xdet1 = Xdet; Xsto1 = Xsto;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
-            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end).*sin(Xdet1{j}{k}(2,1:dwnspl:end));
-            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end).*sin(Xsto1{j}{k}(2,1:dwnspl:end));
+            Xdet{j}{k} = Xdet1{j}{k}(1,1:dwnspl:end).*sin(Xdet1{j}{k}(2,1:dwnspl:end)) + offset;
+            Xsto{j}{k} = Xsto1{j}{k}(1,1:dwnspl:end).*sin(Xsto1{j}{k}(2,1:dwnspl:end)) + offset;
         end
     end
     clear Xdet1 Xsto1
@@ -133,6 +133,10 @@ meanIEIpkdet = zeros(length(Xdet),length(Xdet{1}));meanIEItrdet = zeros(length(X
 meanIEIpksto = zeros(length(Xdet),length(Xdet{1}));meanIEItrsto = zeros(length(Xdet),length(Xdet{1}));
 pkIEIspikeratiodet = zeros(length(Xdet),length(Xdet{1}));pkIEIspikeratiosto = zeros(length(Xdet),length(Xdet{1}));
 trIEIspikeratiodet = zeros(length(Xdet),length(Xdet{1}));trIEIspikeratiosto = zeros(length(Xdet),length(Xdet{1}));
+IEIvarpkdet = zeros(length(Xdet),length(Xdet{1}));IEIvartrdet = zeros(length(Xdet),length(Xdet{1}));
+IEIvarpksto = zeros(length(Xdet),length(Xdet{1}));IEIvartrsto = zeros(length(Xdet),length(Xdet{1}));
+IEImeanpkdet = zeros(length(Xdet),length(Xdet{1}));IEImeantrdet = zeros(length(Xdet),length(Xdet{1}));
+IEImeanpksto = zeros(length(Xdet),length(Xdet{1}));IEImeantrsto = zeros(length(Xdet),length(Xdet{1}));
 
 % Calculate statistics: coefficient of dispersion, spike rate, diffusion
 % coefficient, correlation time
@@ -144,6 +148,10 @@ for j = 1:length(Xdet)
         trspikeratesto(j,k) = length(trsto{j,k})/Ttotal;
         CDdettime(j,k) = detvar(j,k)/detmean(j,k);        % coefficient of dispersion
         CDstotime(j,k) = stovar(j,k)/stomean(j,k);
+        IEIvarpkdet(j,k) = var(IEIpkdet{j,k});IEIvartrdet(j,k) = var(IEItrdet{j,k});
+        IEIvarpksto(j,k) = var(IEIpksto{j,k});IEIvartrsto(j,k) = var(IEItrsto{j,k});
+        IEImeanpkdet(j,k) = mean(IEIpkdet{j,k});IEImeantrdet(j,k) = mean(IEItrdet{j,k});
+        IEImeanpksto(j,k) = mean(IEIpksto{j,k});IEImeantrsto(j,k) = mean(IEItrsto{j,k});
         CDdetpk(j,k) = var(IEIpkdet{j,k})/mean(IEIpkdet{j,k});
         CDdettr(j,k) = var(IEItrdet{j,k})/mean(IEItrdet{j,k});
         CDstopk(j,k) = var(IEIpksto{j,k})/mean(IEIpksto{j,k});
@@ -165,7 +173,11 @@ for j = 1:length(Xdet)
     end
 end
 
-filename2 = filename(1:end-4);
-save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12constrain),'-biftype',num2str(biftype),'.mat'))
-
+if saveyn == 1
+    disp('Saving...');
+    filename2 = filename(1:end-4);
+    save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12thresh),'-biftype',num2str(biftype),'.mat'))
+    disp('Finished.');
+else
+    disp('Not saved.');
 end
