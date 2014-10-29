@@ -77,7 +77,7 @@ tvec=tvec(1:length(Xdet{1}{1}));
 Fs=1/(tvec(2)-tvec(1));
 
 % Time range
-tmin=tvec(0.1*length(tvec));
+tmin=(tvec(round(0.1*length(tvec)))); 
 tmax=tvec(end);
 minindex = find(abs(tvec-tmin)==min(abs(tvec-tmin)));
 maxindex = find(abs(tvec-tmax)==min(abs(tvec-tmax)))-1;
@@ -200,7 +200,7 @@ tvec=tvec(1:length(Xdet{1}{1}{1}));
 Fs=1/(tvec(2)-tvec(1));
 
 % Time range
-tmin=tvec(0.1*length(tvec));
+tmin=(tvec(round(0.1*length(tvec)))); 
 tmax=tvec(end);
 minindex = find(abs(tvec-tmin)==min(abs(tvec-tmin)));
 maxindex = find(abs(tvec-tmax)==min(abs(tvec-tmax)))-1;

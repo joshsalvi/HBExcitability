@@ -25,7 +25,7 @@ load(filename);
         % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf; 4=hair-bundle
         % model
 if biftype == 1
-    Xdet1 = Hopfdet; Xsto1 = Hopfsto;
+    Xdet1 = Xdet; Xsto1 = Xsto;
     clear i;
     for j = 1:length(Xdet1)
         for k = 1:length(Xdet1{1})
@@ -211,7 +211,7 @@ detmean = zeros(length(Xdet),length(Xdet{1}),length(Xdet{1}{1}));
 stomean = zeros(length(Xdet),length(Xdet{1}),length(Xdet{1}{1}));
 dethista = cell(length(Xdet),length(Xdet{1}),length(Xdet{1}{1})); dethistb = cell(length(Xdet),length(Xdet{1}),length(Xdet{1}{1}));
 stohista = cell(length(Xdet),length(Xdet{1}),length(Xdet{1}{1})); stohistb = cell(length(Xdet),length(Xdet{1}),length(Xdet{1}{1}));
-detvar = zeros(length(Xdet),length(Xdet{1}),length(Xdet{1}{1})); stovar = zeros(length(Xdet),length(Xdet{1})length(Xdet{1}{1}));
+detvar = zeros(length(Xdet),length(Xdet{1}),length(Xdet{1}{1})); stovar = zeros(length(Xdet),length(Xdet{1}),length(Xdet{1}{1}));
 
 
 % Generate histograms and calculate statistics

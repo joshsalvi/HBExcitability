@@ -111,7 +111,7 @@ for j = 1:sizeP(1)
 end
 
 sizeP = size(pkdet);
-nperc = 0.5; % percentage for threshold
+nperc = 0.7; % percentage for threshold
 for j = 1:sizeP(1)
     for k = 1:sizeP(2)
       if isempty(pkdet{j,k}) == 0 && isempty(trdet{j,k}) == 0
@@ -269,15 +269,17 @@ for j = 1:length(Xsto)
         fscale = 10^3;
         Xstoscaled = Xstofft{j,k}./fscale;
         Xdetscaled = Xdetfft{j,k}./fscale;
-        if max(2*abs(Xstofft{j,k})) > 1e-2
+        if max(2*abs(Xstofft)) > 1e-2
         Xstofftmaxind = find(Xstofft{j,k}(fstoind)==max(Xstofft{j,k}(fstoind)));
-        Xdetfftmaxind = find(Xdetfft{j,k}(fdetind)==max(Xdetfft{j,k}(fdetind)));
-        fftamplsto(j,k) = Xstofft{j,k}(fstoind(Xstofftmaxind(1)));
-        fftampldet(j,k) = Xdetfft{j,k}(fdetind(Xdetfftmaxind(1)));
-        fftamplsto(j,k) = (sqrt(fscale.*fftamplsto(j,k).*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL)./winpeaknorm;
-        fftampldet(j,k) = (sqrt(fscale.*fftampldet(j,k).*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL)./winpeaknorm;
-        fftfreqsto(j,k) = fstofft{j,k}(fstoind(Xstofftmaxind(1)));
-        fftfreqdet(j,k) = fdetfft{j,k}(fdetind(Xdetfftmaxind(1)));
+        Xdetfftmaxind = find(Xdetfft{j,k}(fd==max(Xdetfft{j,k}));
+        fftamplsto(j,k) = Xstofft{j,k}(Xstofftmaxind(1));
+        fftampldet(j,k) = Xdetfft{j,k}(Xdetfftmaxind(1));
+        fftamplsto(j,k) = (sqrt(fscale.*fftamplsto.*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL)./winpeaknorm;
+        fftampldet(j,k) = (sqrt(fscale.*fftampldet.*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL)./winpeaknorm;
+        fftfreqsto(j,k) = fstofft{j,k}(Xstofftmaxind(1));
+        fftfreqdet(j,k) = fdetfft{j,k}(Xdetfftmaxind(1));
+        fftamplsto(j,k) = 2*abs(Xstofft(Xstofftmaxind(1)));
+        fftampldet(j,k) = 2*abs(Xdetfft(Xdetfftmaxind(1)));
         else
         fftfreqsto(j,k) = 0;
         fftfreqdet(j,k) = 0;
@@ -289,7 +291,7 @@ end
 
     disp('Saving...');
     fnind2=find(filename1=='/');fdir2 = filename1(1:fnind2(end));fprefix2=filename1(fnind2(end)+1:end-4);
-    save(sprintf('%s%s%s%s%s%s',fdir2,'AmplFreq-',fprefix2,'-StiffForceInd-',num2str(stiffind),'-analyzed.mat'),'fftfreqsto','fftfreqdet','fftamplsto','fftampldet','PKamplmeansto','PKamplmeandet','PKamplsemsto','PKamplsemdet','CVtrtime','CVpktime','trtime','pktime','meantrtime','meanpktime','CVtrtimedet','CVpktimedet','trtimedet','pktimedet','meantrtimedet','meanpktimedet','CDpktime','CDtrtime','CDpktimedet','CDtrtimedet','Xstofft','Xdetfft','fstofft','fdetfft','-v7.3')
+    save(sprintf('%s%s%s%s%s%s',fdir2,'AmplFreq-',fprefix2,'-StiffForceInd-',num2str(stiffind),'-analyzed.mat'),'fftfreqsto','fftfreqdet','fftamplsto','fftampldet','PKamplmeansto','PKamplmeandet','PKamplsemsto','PKamplsemdet','CVtrtime','CVpktime','trtime','pktime','meantrtime','meanpktime','CVtrtimedet','CVpktimedet','trtimedet','pktimedet','meantrtimedet','meanpktimedet','CDpktime','CDtrtime','CDpktimedet','CDtrtimedet','Xstofft','Xdetfft','-v7.3')
 
     disp('Finished.');
 
