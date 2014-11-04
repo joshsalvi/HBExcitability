@@ -263,9 +263,9 @@ for j = 1:length(Xsto)
     for k = 1:length(Xsto{1})
         clear Xstoscaled Xdetscaled
         [Xstofft{j,k}, fstofft{j,k}]= pwelch(Xsto{j}{k},winfunc,noverlap,NPSD,Fs);
-        fstoind = find(fstofft{j,k} > 0.005);
+        fstoind = find(fstofft{j,k} > 0.0001);
         [Xdetfft{j,k}, fdetfft{j,k}] = pwelch(Xdet{j}{k},winfunc,noverlap,NPSD,Fs);
-        fdetind = find(fdetfft{j,k} > 0.005);
+        fdetind = find(fdetfft{j,k} > 0.0001);
         fscale = 10^3;
         Xstoscaled = Xstofft{j,k}./fscale;
         Xdetscaled = Xdetfft{j,k}./fscale;
@@ -276,6 +276,7 @@ for j = 1:length(Xsto)
         fftampldet(j,k) = Xdetfft{j,k}(fdetind(Xdetfftmaxind(1)));
         fftamplsto(j,k) = (sqrt(fscale.*fftamplsto(j,k).*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL)./winpeaknorm;
         fftampldet(j,k) = (sqrt(fscale.*fftampldet(j,k).*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL)./winpeaknorm;
+        
         fftfreqsto(j,k) = fstofft{j,k}(fstoind(Xstofftmaxind(1)));
         fftfreqdet(j,k) = fdetfft{j,k}(fdetind(Xdetfftmaxind(1)));
         else
