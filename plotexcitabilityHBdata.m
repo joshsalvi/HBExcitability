@@ -78,7 +78,7 @@ subplot(2,1,1);
 ha=plot(I,CDdetpk(1,:),'k');
 hb = get(ha,'children'); 
 set(get(ha,'Parent'),'YScale','log');
-set(gca,'xdir','reverse')hold on;
+set(gca,'xdir','reverse');hold on;
 plot(I,1./sqrt(IEImeanpkdet),'k--')
 plot(I,ones(1,length(I)),'g--');
 legend('Data','1/sqrt(mean','CV=1');
@@ -175,7 +175,7 @@ title('Bundle Data');
 
 % PLOT THE PEAK-TO-TROUGH AMPLITUDES
 figure(5);
-subplot(3,1,3);
+subplot(3,1,1);
 ha=plot(I,PKamplmeandet(1,:),'k');
 hb = get(ha,'children'); 
 set(gca,'xdir','reverse'); hold on;
@@ -191,91 +191,52 @@ title('Bundle Data');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Iselected = [-0.4 -0.2 -0.1 -0.05 -0.01 0.05 0.1 0.2 0.3 0.4]; % CHOOSE
-clear Iselect
-for k = 1:length(Iselected)
-    Iselect(k) = max(findnearest(I,Iselected(k)));
+Ilength = ceil(length(I)/5);
+for j = 1:Ilength
+    if j < Ilength
+        Iselect2(j,:) = I(1+(j-1)*5:5*j);
+        Iselect(j,:) = 1+(j-1)*5:5*j;
+    else
+        Iselect2(j,:) = zeros(1,5);
+        Iselect(j,:) = zeros(1,5);
+        for k = 1:length(I(1+(j-1)*5:end))
+            Iselect2(j,k) = I(1+(j-1)*5+(k-1));
+            Iselect(j,k) = 1+(j-1)*5+(k-1);
+        end
+    end
 end
-tmin=10000;tmax=15000;    % CHOOSE
-ymin=-2;ymax=2;
-yimin=ymin*2;yimax=ymax*2;
+tmin=round(length(tvec)*0.75);tmax=(length(tvec));    % CHOOSE
+ymin=1.5*min(Xd_dwnspl{1}{1});ymax=1.5*max(Xd_dwnspl{1}{1});
+yimin=ymin;yimax=ymax;
 dwnsplquiver=20;quiverstart=2000;quiverend=4000;quiverscale=1;
 dwnsplrealimag=10;realimagstart=2000;realimagend=4000;
-fmin = 0.05; fmax = 0.3;
+fmin = 0; fmax = 1.5*max(max(fftfreqdet));
+
 
 % PLOT EXAMPLE TIME TRACES AND PHASE PORTRAITS
 % Deterministic
-xdr=real(hilbert(Xdet{1}{Iselect(end)}));xdi=imag(hilbert(Xdet{1}{Iselect(end)}));
-[bw dens mx1 my1]=kde2d([xdr',xdi']);
-for k = 1:length(Iselect);
-    figure(6);
-    sph=subplot(6,length(Iselect),k);plot(Xdet{1}{Iselect(k)},'k');axis([tmin tmax ymin ymax]);
-    %xlabel('Time');ylabel('Position');
-    title(sprintf('%s %s%s','Deterministic','I = ',num2str(I(Iselect(k)))));
-    spp = get(sph, 'pos');
-    set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-    xdr=real(hilbert(Xdet{1}{Iselect(k)}));xdi=imag(hilbert(Xdet{1}{Iselect(k)}));
-    if length(unique(xdr)) > 1 && length(unique(xdi)) > 1
-        sph=subplot(6,length(Iselect),k+3*length(Iselect));[bw dens mx my]=kde2d([xdr',xdi'],2^8,[ymin,ymin],[ymax,ymax]);
-        if length(my(:,1)) < size(dens,1)
-            my(end:size(dens,1),:)=0;
-        elseif length(my(:,1)) > size(dens,1)
-            dens(end:length(my(:,1)),:)=0;
-        end
-        if length(mx(1,:)) < size(dens,2)
-            mx(end:size(dens,2))=0;
-        elseif length(mx(1,:)) > size(dens,2)
-            dens(:,end:length(mx(1,:)))=0;
-        end
-        %xlabel('Real');ylabel('Imaginary');
-        spp = get(sph, 'pos');
-        sph=subplot(6,length(Iselect),k+length(Iselect));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'k');axis([mx1(1,1) mx(1,end) my(1,1) my(end,1)]);
-        %xlabel('Real');ylabel('Imaginary');
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+2*length(Iselect));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'k');axis([mx1(1,1) mx(1,end) my(1,1) my(end,1)]);
-        %xlabel('Real');ylabel('Imaginary');
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+3*length(Iselect));pcolor(mx(1,:)',my(:,1)',dens);shading interp;load jetnew.mat;colormap(cjetnew);
-        %xlabel('Real');ylabel('Imaginary');
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        [bw1,dens1,xmesh]=kde1d(xdr);dens1=dens1./sum(dens1);
-        sph=subplot(6,length(Iselect),k+4*length(Iselect));plot(xmesh,dens1,'k');axis([mx(1,1) mx(1,end) 0 1.1*max(dens1)]);
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+5*length(Iselect));plot(fdetfft{j,Iselect(k)},Xdetfft{1,Iselect(k)},'k');axis([fmin fmax 0 2.1*fftampldet(1,500)]);
-        %tt=findnearest(fdetfft{j,Iselect(k)},fftfreqdet(1,Iselect(k)));tt=tt(1);hold on;scatter(fdetfft{j,Iselect(k)}(tt),Xdetfft{1,Iselect(k)}(tt),'b.');
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-    else
-        sph=subplot(6,length(Iselect),k+length(Iselect));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'k');axis([yimin yimax yimin yimax]);
-        %xlabel('Real');ylabel('Imaginary');
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+2*length(Iselect));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'k');axis([yimin yimax yimin yimax]);
-        %xlabel('Real');ylabel('Imaginary');
-        spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+n=1;
+
+for k = 1:length(Xd_dwnspl{1})
+    for j = 1:length(Xd_dwnspl)
+        Xd_dwnspl2{n} = Xd_dwnspl{j}{k};
+        fdetfft2{n} = fdetfft{j,k};
+        Xd_dwnsplfft2{n} = Xd_dwnsplfft{j,k};
+        n=n+1;
     end
 end
-
-% Stochastic
-xdr=real(hilbert(Xsto{j}{Iselect(end)}));xdi=imag(hilbert(Xsto{j}{Iselect(end)}));
-[bw dens mx1 my1]=kde2d([xdr',xdi']);
-for j = 1:maxiter
-for k = 1:length(Iselect);
+Xd_dwnspl=Xd_dwnspl2;fdetfft=fdetfft2;Xd_dwnsplfft=Xd_dwnsplfft2;clear Xd_dwnspl2 Xd_dwnsplfft2 fdetfft2;
+for j = 1:Ilength
+for k = 1:sum((Iselect(j,:)~=0))
     figure(6+j);
-    sph=subplot(6,length(Iselect),k);plot(Xsto{j}{Iselect(k)},'r');axis([tmin+500*j tmax+500*j ymin ymax]);
+    sph=subplot(6,length(Iselect(1,:)),k);plot(Xscale2(k+(j-1)*5).*Xd_dwnspl{Iselect(j,k)},'k');axis([tmin tmax ymin ymax]);
     %xlabel('Time');ylabel('Position');
-    title(sprintf('%s%s %s%s','Noise = ',num2str(noiselevel(j)),', I = ',num2str(I(Iselect(k)))));
+    title(sprintf('%s %s%s','Bundle Data','I = ',num2str((Iselect(j,k)))));
     spp = get(sph, 'pos');
     set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-    xdr=real(hilbert(Xsto{j}{Iselect(k)}));xdi=imag(hilbert(Xsto{j}{Iselect(k)}));
+    xdr=real(hilbert(Xscale2(k+(j-1)*5).*Xd_dwnspl{Iselect(j,k)}));xdi=imag(hilbert(Xscale2(k+(j-1)*5).*Xd_dwnspl{Iselect(j,k)}));
     if length(unique(xdr)) > 1 && length(unique(xdi)) > 1
-        sph=subplot(5,length(Iselect),k+3*length(Iselect));[bw dens mx my]=kde2d([xdr',xdi'],2^8,[ymin,ymin],[ymax,ymax]);
+        sph=subplot(6,length(Iselect(1,:)),k+3*length(Iselect(1,:)));[bw dens mx my]=kde2d([xdr,xdi],2^8,[ymin,ymin],[ymax,ymax]);
         if length(my(:,1)) < size(dens,1)
             my(end:size(dens,1),:)=0;
         elseif length(my(:,1)) > size(dens,1)
@@ -288,32 +249,32 @@ for k = 1:length(Iselect);
         end
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
-        sph=subplot(6,length(Iselect),k+length(Iselect));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'r');axis([mx1(1,1) mx(1,end) my(1,1) my(end,1)]);
+        sph=subplot(6,length(Iselect(1,:)),k+length(Iselect(1,:)));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'k');axis([mx(1,1) mx(1,end) my(1,1) my(end,1)]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+2*length(Iselect));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'r');axis([mx1(1,1) mx(1,end) my(1,1) my(end,1)]);
+        sph=subplot(6,length(Iselect(1,:)),k+2*length(Iselect(1,:)));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'k');axis([mx(1,1) mx(1,end) my(1,1) my(end,1)]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+3*length(Iselect));pcolor(mx(1,:)',my(:,1)',dens);shading interp;load jetnew.mat;colormap(cjetnew);
+        sph=subplot(6,length(Iselect(1,:)),k+3*length(Iselect(1,:)));pcolor(mx(1,:)',my(:,1)',dens);shading interp;load jetnew.mat;colormap(cjetnew);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         [bw1,dens1,xmesh]=kde1d(xdr);dens1=dens1./sum(dens1);
-        sph=subplot(6,length(Iselect),k+4*length(Iselect));plot(xmesh,dens1,'k');axis([mx(1,1) mx(1,end) 0 1.1*max(dens1)]);
+        sph=subplot(6,length(Iselect(1,:)),k+4*length(Iselect(1,:)));plot(xmesh,dens1,'k');axis([mx(1,1) mx(1,end) 0 1.1*max(dens1)]);
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+5*length(Iselect));plot(fstofft{j,Iselect(k)},Xstofft{j,Iselect(k)},'r');axis([fmin fmax 0 1.2*max(Xstofft{j,Iselect(k)})]);
-        %tt=findnearest(fstofft{j,Iselect(k)},fftfreqsto(1,Iselect(k)));tt=tt(1);hold on;scatter(fstofft{j,Iselect(k)}(tt),Xstofft{1,Iselect(k)}(tt),'b.');        
+        sph=subplot(6,length(Iselect(1,:)),k+5*length(Iselect(1,:)));plot(fdetfft{Iselect(j,k)},Xscale2(k+(j-1)*5).*Xd_dwnsplfft{Iselect(j,k)},'k');axis([fmin fmax 0 2.1*fftampldet(end)]);
+        %tt=findnearest(fdetfft{j,Iselect(j,k)},fftfreqdet(1,Iselect(j,k)));tt=tt(1);hold on;scatter(fdetfft{j,Iselect(j,k)}(tt),Xscale2(k+(j-1)*5).*Xd_dwnsplfft{1,Iselect(j,k)}(tt),'b.');
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
     else
-        sph=subplot(6,length(Iselect),k+length(Iselect));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'r');axis([yimin yimax yimin yimax]);
+        sph=subplot(6,length(Iselect(1,:)),k+length(Iselect(1,:)));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'k');axis([yimin yimax yimin yimax]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
-        sph=subplot(6,length(Iselect),k+2*length(Iselect));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'r');axis([yimin yimax yimin yimax]);
+        sph=subplot(6,length(Iselect(1,:)),k+2*length(Iselect(1,:)));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'k');axis([yimin yimax yimin yimax]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
         set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
