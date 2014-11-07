@@ -1,4 +1,4 @@
-function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,saveyn)
+function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet c1det c2det] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,saveyn)
 % This function imports raw data and performs a peak-finding algorithm
 % analysis. 
 %
@@ -13,7 +13,7 @@ function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet] = excitabi
 % nnthresh : nearest-neighbor clustering on a defined point or absolute
 % threshold? (1= nearest neighbor; 2= absolute threshold)
 % c12thresh : threshold based upon nnthresh (index number or threshold
-% value)
+% value) - if index number use the form [a b]
 % saveyn : save? (1=yes)
 %
 % If you want to perform a proper histogram analysis, modify the code to
@@ -27,17 +27,21 @@ function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet] = excitabi
 importfile=dir(sprintf('%s%s',filepath,'Extracted Data.mat'));
 load(sprintf('%s%s',filepath,importfile.name));
 
+tstart=1;
+if exist('Xd_pulse')==1
+    Xd=Xd_pulse;
+end
 % Downsample data
 for j = 1:a
     for i = 1:(logdata.data(1,8))
-        Xd_dwnspl{i}{j} = Xd(1:dwnspl:length(Xd),i,j);  % downsample
+        Xd_dwnspl{i}{j} = Xd(tstart:dwnspl:length(Xd),i,j);  % downsample
         Xd(:,i,j) = Xd(:,i,j) - smooth(Xd(:,i,j),length(Xd(:,i,j))) + offset;   % remove drift
         Xd_dwnspl{i}{j} = Xd_dwnspl{i}{j} - smooth(Xd_dwnspl{i}{j},length(Xd_dwnspl{i}{j})/10) + offset;    % remove drift
     end
 end
 
 % Define time vector
-tvec=time(1:dwnspl:length(time));
+tvec=time(tstart:dwnspl:length(time));
 clear time;
 % Define the sample rate if not already done
 Fs=1/(tvec(2)-tvec(1))*1e3;
@@ -48,7 +52,8 @@ Fs=1/(tvec(2)-tvec(1))*1e3;
 tmin=tvec(round(0.1*length(tvec)));
 tmax=tvec(end);
 minindex = find(abs(tvec-tmin)==min(abs(tvec-tmin)));
-maxindex = find(abs(tvec-tmax)==min(abs(tvec-tmax)))-1;
+maxindex = length(Xd_dwnspl{1}{1});
+%maxindex = find(abs(tvec-tmax)==min(abs(tvec-tmax)))-1;
 Ttotal = tmax-tmin;
 
 % Find amplitudes and frequencies using FFT
@@ -110,8 +115,8 @@ detvar = zeros(length(Xd_dwnspl),length(Xd_dwnspl{1}));
 
 
 % Generate histograms and calculate statistics
-for k = 1:a
-    for j = 1:(logdata.data(1,8))
+for k = 1:size(Xd_dwnspl{1})
+    for j = 1:size(Xd_dwnspl)
         Xd_dwnspl{j}{k} = bsxfun(@minus, Xd_dwnspl{j}{k}, mean(Xd_dwnspl{j}{k}(minindex:maxindex)));
         [dethista{j,k}, dethistb{j,k}] = hist(Xd_dwnspl{j}{k},freedmandiaconis(Xd_dwnspl{j}{k}));
         bincount = sum(dethista{j,k}); dethista{j,k} = dethista{j,k}./bincount;
@@ -227,7 +232,7 @@ for k = 1:a
     for j = 1:(logdata.data(1,8))
         if j == 1 && k == 1
             if nnthresh == 1
-                [c1det,c2det]=twoclass(Xd_dwnspl{c12thresh},NNerr);  % nearest-neighbor clustering
+                [c1det,c2det]=twoclass(Xd_dwnspl{c12thresh(1)}{c12thresh(2)},NNerr);  % nearest-neighbor clustering
                 [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, max([c1det c2det]));
             elseif nnthresh==2
                 [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, c12thresh);
@@ -240,7 +245,7 @@ for k = 1:a
             end
         else
             if nnthresh == 1
-                [c1det,c2det]=twoclass(Xd_dwnspl{j}{c12thresh},NNerr);  % nearest-neighbor clustering
+                [c1det,c2det]=twoclass(Xd_dwnspl{c12thresh(1)}{c12thresh(2)},NNerr);  % nearest-neighbor clustering
                 [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, max([c1det c2det]));
             elseif nnthresh==2
                 [pkdet{j,k},trdet{j,k}] = PTDetect(Xd_dwnspl{j}{k}, c12thresh);
@@ -364,10 +369,10 @@ end
 
 % Calculate the time for each peak and trough
 sizeP = size(pkdet);
-nperc = 0.7; % percentage for threshold
+nperc = 0.5; % percentage for threshold
 
 sizeP = size(pkdet);
-nperc = 0.7; % percentage for threshold
+nperc = 0.5; % percentage for threshold
 for j = 1:sizeP(1)
     for k = 1:sizeP(2)
       if isempty(pkdet{j,k}) == 0 && isempty(trdet{j,k}) == 0

@@ -186,13 +186,7 @@ xlabel('Control Parameter');ylabel('Peak-to-trough amplitude');
 title('Bundle Data');
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%  TO BE COMPLETED  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 Ilength = ceil(length(I)/5);
 for j = 1:Ilength
     if j < Ilength
@@ -207,9 +201,9 @@ for j = 1:Ilength
         end
     end
 end
-tmin=round(length(tvec)*0.5);tmax=(length(tvec));    % CHOOSE
-ymin=1.5*min(Xd_dwnspl{1}{1});ymax=1.5*max(Xd_dwnspl{1}{1});
-yimin=ymin;yimax=ymax;
+tmin=round((length(Xd_dwnspl{1}{1}))*0.8);tmax=(length(Xd_dwnspl{1}{1}));    % CHOOSE
+ymin=3*min(Xd_dwnspl{1}{1});ymax=3*max(Xd_dwnspl{1}{1});
+yimin=2*ymin;yimax=2*ymax;
 dwnsplquiver=20;quiverstart=tmin;quiverend=tmax;quiverscale=1;
 dwnsplrealimag=10;realimagstart=tmin;realimagend=tmax;dwnspl2=dwnsplrealimag;
 fmin = 0; fmax = 5*max(max(fftfreqdet));
