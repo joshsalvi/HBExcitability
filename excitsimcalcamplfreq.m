@@ -266,9 +266,9 @@ for j = 1:length(Xsto)
         fstoind = find(fstofft{j,k} > 0.0001);
         [Xdetfft{j,k}, fdetfft{j,k}] = pwelch(Xdet{j}{k},winfunc,noverlap,NPSD,Fs);
         fdetind = find(fdetfft{j,k} > 0.0001);
-        fscale = 10^3;
-        Xstoscaled = Xstofft{j,k}./fscale;
-        Xdetscaled = Xdetfft{j,k}./fscale;
+        fscale = 1;
+        Xstofft{j,k} = Xstofft{j,k}./fscale;
+        Xdetfft{j,k} = Xdetfft{j,k}./fscale;
         if max(2*abs(Xstofft{j,k})) > 1e-2
         Xstofftmaxind = find(Xstofft{j,k}(fstoind)==max(Xstofft{j,k}(fstoind)));
         Xdetfftmaxind = find(Xdetfft{j,k}(fdetind)==max(Xdetfft{j,k}(fdetind)));
