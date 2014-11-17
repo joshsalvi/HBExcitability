@@ -6,6 +6,11 @@ function [threshrec noisefloor totpower frdetnoise frstonoise frdettot frstotot]
 %
 % [noisefloor totpower frdetnoise frstonoise frdettot frstotot] = findthreshsim(filename,dwnspl,biftype,offset)
 %
+% Thresholds are recommended as the noisefloor plus divisions (0.25%) the
+% difference between the total power and noise floor. That is, threshrec is
+% equal to max(noisefloor) + n*[max(totpower)/max(noisefloor)]/4,
+% where n = 1, 2, 3.
+%
 % filename: name of MAT file with directory
 % dwnspl: downsampling factor
 % biftype: 1=supercritical Hopf, 2=SNIC, 3=subcritical Hopf, 4=HB model
@@ -155,8 +160,9 @@ totpower(1) = max(max(frstotot));
 totpower(2) = max(max(frdettot));
 
 powdiff = max(totpower)-max(noisefloor);
+powdiff = powdiff/4;
 for j = 1:3
-    threshrec(1) = max(noisefloor)+j*powdiff;
+    threshrec(j) = max(noisefloor)+j*powdiff;
 end
 
 
