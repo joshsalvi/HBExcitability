@@ -1,4 +1,4 @@
-function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet c1det c2det] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,saveyn)
+function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet c1det c2det] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,scaleyn,saveyn)
 % This function imports raw data and performs a peak-finding algorithm
 % analysis. 
 %
@@ -14,6 +14,7 @@ function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet c1det c2det
 % threshold? (1= nearest neighbor; 2= absolute threshold)
 % c12thresh : threshold based upon nnthresh (index number or threshold
 % value) - if index number use the form [a b]
+% scaleyn : use power spectra to rescale the data? (1=yes)
 % saveyn : save? (1=yes)
 %
 % If you want to perform a proper histogram analysis, modify the code to
@@ -88,7 +89,11 @@ for j = 1:length(Xd_dwnspl)
         fftfreqdet(j,k) = 0;
         fftampldet(j,k) = 0;  
         end
+        if scaleyn == 1
         Xscale2(j,k) = rms(Xd_dwnsplfft{1,1}(g:g2))/rms(Xd_dwnsplfft{j,k}(g:g2)); %rescale the signals from the noise
+        else
+            Xscale2(j,k) = 1;
+        end
     end
 end
 

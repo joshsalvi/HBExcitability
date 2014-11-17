@@ -105,6 +105,7 @@ for j = 1:length(Xdet)
     end
 end
 
+
 % Nearest-neighbor clustering and peak finding
 
 % Preallocate memory
