@@ -60,34 +60,18 @@ elseif biftype == 3
     end
     clear Xdet1 Xsto1
 elseif biftype == 4
-    sizeX = size(Xdet);
-    Xdet1 = Xdet; Xsto1 = Xsto;
-    clear Xdet Xsto
-    for j = 1:sizeX(1)
-        for k = 1:sizeX(2)
-            for l = 1:sizeX(3)
-                Xdet{j}{k}{l} = Xdet1{j,k,l}(1,1:dwnspl:end) + offset;
-                Xsto{j}{k}{l} = Xsto1{j,k,l}(1,1:dwnspl:end) + offset;
-            end
-        end
+    Xsto1=Xsto; Xdet1=Xdet;;clear Xdet Xsto;
+    sizeX = size(Xdet1);
+for j = 1:sizeX(1)       % Isolate the appropriate index
+    for m = 1:sizeX(3)
+        Xsto{m}{j} = Xsto1{j,stiffind,m}(1,1:dwnspl:end) + offset;
+        Xdet{m}{j} = Xdet1{j,stiffind,m}(1,1:dwnspl:end) + offset;
     end
-    clear Xdet1 Xsto1
+end
 else
     disp('No bifurcation type chosen');
 end
 
-if biftype == 1 || biftype == 2 || biftype == 3
-    stiffind=1;
-elseif biftype == 4
-        Xsto1=Xsto; Xdet1=Xdet; 
-        clear Xdet Xsto;
-for j = 1:length(Xdet1)       % Isolate the appropriate index
-    for m = 1:length(Xdet1{1}{1})
-        Xsto{m}{j} = Xsto1{j}{stiffind}{m};
-        Xdet{m}{j} = Xdet1{j}{stiffind}{m};
-    end
-end
-end 
 
 
 
@@ -123,9 +107,9 @@ for j = 1:length(Xsto)
     for k = 1:length(Xsto{1})
         clear Xstoscaled Xdetscaled frsto frdet
         [Xstofft{j,k}, fstofft{j,k}]= pwelch(Xsto{j}{k},winfunc,noverlap,NPSD,Fs);
-        fstoind = find(fstofft{j,k} > 0.0001);
+        fstoind = find(fstofft{j,k} > 0.001);
         [Xdetfft{j,k}, fdetfft{j,k}] = pwelch(Xdet{j}{k},winfunc,noverlap,NPSD,Fs);
-        fdetind = find(fdetfft{j,k} > 0.0001);
+        fdetind = find(fdetfft{j,k} > 0.001);
         fscale = 1e3;
         Xstofft{j,k} = Xstofft{j,k}./fscale;
         Xdetfft{j,k} = Xdetfft{j,k}./fscale;
@@ -135,10 +119,14 @@ for j = 1:length(Xsto)
         frsto = Xstofft{j,k};
         frdet = Xdetfft{j,k};
         % Find mean and standard deviation of noise far away from peak
-        fftstomean = mean(Xstofft{j,k}(fstoind(Xstofftmaxind(1))+1000:fstoind(Xstofftmaxind(1))+2000));
-        fftstostd = std(Xstofft{j,k}(fstoind(Xstofftmaxind(1))+1000:fstoind(Xstofftmaxind(1))+2000));
-        fftdetmean = mean(Xdetfft{j,k}(fstoind(Xdetfftmaxind(1))+1000:fstoind(Xdetfftmaxind(1))+2000));
-        fftdetstd = std(Xdetfft{j,k}(fstoind(Xdetfftmaxind(1))+1000:fstoind(Xdetfftmaxind(1))+2000));
+        fftstomean = mean(Xstofft{j,k}(round(length(Xstofft{j,k})/2):end));
+        fftdetmean = mean(Xdetfft{j,k}(round(length(Xdetfft{j,k})/2):end));
+        fftstostd = std(Xstofft{j,k}(round(length(Xstofft{j,k})/2):end));
+        fftdetstd = std(Xdetfft{j,k}(round(length(Xdetfft{j,k})/2):end));
+        %fftstomean = mean(Xstofft{j,k}(fstoind(Xstofftmaxind(1))+1000:fstoind(Xstofftmaxind(1))+2000));
+        %fftstostd = std(Xstofft{j,k}(fstoind(Xstofftmaxind(1))+1000:fstoind(Xstofftmaxind(1))+2000));
+        %fftdetmean = mean(Xdetfft{j,k}(fstoind(Xdetfftmaxind(1))+1000:fstoind(Xdetfftmaxind(1))+2000));
+        %fftdetstd = std(Xdetfft{j,k}(fstoind(Xdetfftmaxind(1))+1000:fstoind(Xdetfftmaxind(1))+2000));
         % Remove peak
         frsto(frsto>(fftstomean+fftstostd))=0;
         frdet(frdet>(fftdetmean+fftdetstd))=0;
@@ -157,6 +145,7 @@ noisefloor(1) = max(max(frstonoise));
 noisefloor(2) = max(max(frdetnoise));
 totpower(1) = max(max(frstotot));
 totpower(2) = max(max(frdettot));
+
 
 powdiff = max(totpower)-max(noisefloor);
 powdiff = powdiff/4;

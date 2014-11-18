@@ -6,7 +6,10 @@ function [threshrec noisefloor totpower frdetnoise frstonoise frdettot frstotot]
 %
 % [noisefloor totpower frdetnoise frstonoise frdettot frstotot] = findthreshsim(filename,dwnspl,biftype,offset)
 %
-% Thresholds are recommended as the no
+% Thresholds are recommended as the noisefloor plus divisions (0.25%) the
+% difference between the total power and noise floor. That is, threshrec is
+% equal to max(noisefloor) + n*[max(totpower)/max(noisefloor)]/4,
+% where n = 1, 2, 3.
 %
 % filename: name of MAT file with directory
 % dwnspl: downsampling factor
@@ -57,35 +60,18 @@ elseif biftype == 3
     end
     clear Xdet1 Xsto1
 elseif biftype == 4
-    sizeX = size(Xdet);
-    Xdet1 = Xdet; Xsto1 = Xsto;
-    clear Xdet Xsto
-    for j = 1:sizeX(1)
-        for k = 1:sizeX(2)
-            for l = 1:sizeX(3)
-                Xdet{j}{k}{l} = Xdet1{j,k,l}(1,1:dwnspl:end) + offset;
-                Xsto{j}{k}{l} = Xsto1{j,k,l}(1,1:dwnspl:end) + offset;
-            end
-        end
+    Xsto1=Xsto; Xdet1=Xdet;;clear Xdet Xsto;
+    sizeX = size(Xdet1);
+for j = 1:sizeX(1)       % Isolate the appropriate index
+    for m = 1:sizeX(3)
+        Xsto{m}{j} = Xsto1{j,stiffind,m}(1,1:dwnspl:end) + offset;
+        Xdet{m}{j} = Xdet1{j,stiffind,m}(1,1:dwnspl:end) + offset;
     end
-    clear Xdet1 Xsto1
+end
 else
     disp('No bifurcation type chosen');
 end
 
-if biftype == 1 || biftype == 2 || biftype == 3
-    stiffind=1;
-elseif biftype == 4
-        Xsto1=Xsto; Xdet1=Xdet; pksto1=pksto;pkdet1=pkdet;trsto1=trsto;trdet1=trdet;clear Xdet Xsto pkdet pksto trdet trsto;
-for j = 1:length(Xdet1)       % Isolate the appropriate index
-    for m = 1:length(Xdet1{1}{1})
-        Xsto{m}{j} = Xsto1{j}{stiffind}{m};
-        Xdet{m}{j} = Xdet1{j}{stiffind}{m};
-        pksto{m,j} = pksto1{j,stiffind,m};pkdet{m,j} = pkdet1{j,stiffind,m};
-        trsto{m,j} = trsto1{j,stiffind,m};trdet{m,j} = pkdet1{j,stiffind,m};
-    end
-end
-end 
 
 
 
@@ -150,11 +136,14 @@ for j = 1:length(Xsto)
         end
     end
 end
-
+if biftype == 4
+noisefloor(1) = min(min(frston    
+else
 noisefloor(1) = max(max(frstonoise));
 noisefloor(2) = max(max(frdetnoise));
 totpower(1) = max(max(frstotot));
 totpower(2) = max(max(frdettot));
+end
 
 powdiff = max(totpower)-max(noisefloor);
 powdiff = powdiff/4;
