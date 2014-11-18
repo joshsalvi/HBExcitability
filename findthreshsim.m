@@ -79,13 +79,12 @@ end
 if biftype == 1 || biftype == 2 || biftype == 3
     stiffind=1;
 elseif biftype == 4
-        Xsto1=Xsto; Xdet1=Xdet; pksto1=pksto;pkdet1=pkdet;trsto1=trsto;trdet1=trdet;clear Xdet Xsto pkdet pksto trdet trsto;
+        Xsto1=Xsto; Xdet1=Xdet; 
+        clear Xdet Xsto;
 for j = 1:length(Xdet1)       % Isolate the appropriate index
     for m = 1:length(Xdet1{1}{1})
         Xsto{m}{j} = Xsto1{j}{stiffind}{m};
         Xdet{m}{j} = Xdet1{j}{stiffind}{m};
-        pksto{m,j} = pksto1{j,stiffind,m};pkdet{m,j} = pkdet1{j,stiffind,m};
-        trsto{m,j} = trsto1{j,stiffind,m};trdet{m,j} = pkdet1{j,stiffind,m};
     end
 end
 end 

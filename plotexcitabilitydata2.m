@@ -58,7 +58,7 @@ for j = 1:maxiter
         PKamplmeanstoAVG(j,k)= mean([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)]);
         PKamplmeanstoSEM(j,k)= std([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)])/sqrt(5);
     end
-    transitionend(j) = find(CDtstat(j,:)==max(CDtstat(j,:)));
+    transitionend(j) = find(abs(CDtstat(j,:))==max(abs(CDtstat(j,:))));
     transitionend_p(j) = CDpsto(j,transitionend(j));
 end
 %}
@@ -95,8 +95,10 @@ meanIEItrdet=mean(meanIEItrdet,1);meanpktimedet=mean(meanpktimedet,1);meantrtime
 PKamplmeandet=mean(PKamplmeandet,1);pkdiffusiondet=mean(pkdiffusiondet,1);pkIEIspikeratiodet=mean(pkIEIspikeratiodet,1);
 pktcorrdet=mean(pktcorrdet,1);trdiffusiondet=mean(trdiffusiondet,1);trtcorrdet=mean(trtcorrdet,1);
 
+tr2=find(pkspikeratedet(1,:)==0);
+tr2=max(tr2);
 for j = 1:maxiter
-    pkspikshift(j) = I(transitionend(j)) - I(251);
+    pkspikshift(j) = I(transitionend(j)) - I(tr2);
     I_shifted(j,:) = I - pkspikshift(j);
 end
 
@@ -594,7 +596,7 @@ for j = 1:maxiter
         PKamplmeanstoAVG(j,k)= mean([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)]);
         PKamplmeanstoSEM(j,k)= std([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)])/sqrt(5);
     end
-    transitionend(j) = find(CDtstat(j,:)==max(CDtstat(j,:)));
+    transitionend(j) = find(abs(CDtstat(j,:))==max(abs(CDtstat(j,:))));
     transitionend_p(j) = CDpsto(j,transitionend(j));
 end
 
@@ -628,8 +630,10 @@ meanIEItrdet=mean(meanIEItrdet,1);meanpktimedet=mean(meanpktimedet,1);meantrtime
 PKamplmeandet=mean(PKamplmeandet,1);pkdiffusiondet=mean(pkdiffusiondet,1);pkIEIspikeratiodet=mean(pkIEIspikeratiodet,1);
 pktcorrdet=mean(pktcorrdet,1);trdiffusiondet=mean(trdiffusiondet,1);trtcorrdet=mean(trtcorrdet,1);
 
+tr2=find(pkspikeratedet(1,:)==0);
+tr2=max(tr2);
 for j = 1:maxiter
-    pkspikshift(j) = I(transitionend(j)) - I(251);
+    pkspikshift(j) = I(transitionend(j)) - I(tr2);
     I_shifted(j,:) = I - pkspikshift(j);
 end
 
@@ -1093,7 +1097,7 @@ for j = 1:maxiter
         PKamplmeanstoAVG(j,k)= mean([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)]);
         PKamplmeanstoSEM(j,k)= std([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)])/sqrt(5);
     end
-    transitionend(j) = find(CDtstat(j,:)==max(CDtstat(j,:)));
+    transitionend(j) = find(abs(CDtstat(j,:))==max(abs(CDtstat(j,:))));
     transitionend_p(j) = CDpsto(j,transitionend(j));
 end
 
@@ -1127,8 +1131,10 @@ meanIEItrdet=mean(meanIEItrdet,1);meanpktimedet=mean(meanpktimedet,1);meantrtime
 PKamplmeandet=mean(PKamplmeandet,1);pkdiffusiondet=mean(pkdiffusiondet,1);pkIEIspikeratiodet=mean(pkIEIspikeratiodet,1);
 pktcorrdet=mean(pktcorrdet,1);trdiffusiondet=mean(trdiffusiondet,1);trtcorrdet=mean(trtcorrdet,1);
 
+tr2=find(pkspikeratedet(1,:)==0);
+tr2=max(tr2);
 for j = 1:maxiter
-    pkspikshift(j) = I(transitionend(j)) - I(251);
+    pkspikshift(j) = I(transitionend(j)) - I(tr2);
     I_shifted(j,:) = I - pkspikshift(j);
 end
 
@@ -1624,7 +1630,7 @@ for j = 1:maxiter
         PKamplmeanstoAVG(j,k)= mean([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)]);
         PKamplmeanstoSEM(j,k)= std([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)])/sqrt(5);
     end
-    transitionend(j) = find(CDtstat(j,:)==max(CDtstat(j,:)));
+    transitionend(j) = find(abs(CDtstat(j,:))==max(abs(CDtstat(j,:))));
     transitionend_p(j) = CDpsto(j,transitionend(j));
 end
 
@@ -1658,8 +1664,11 @@ meanIEItrdet=mean(meanIEItrdet,1);meanpktimedet=mean(meanpktimedet,1);meantrtime
 PKamplmeandet=mean(PKamplmeandet,1);pkdiffusiondet=mean(pkdiffusiondet,1);pkIEIspikeratiodet=mean(pkIEIspikeratiodet,1);
 pktcorrdet=mean(pktcorrdet,1);trdiffusiondet=mean(trdiffusiondet,1);trtcorrdet=mean(trtcorrdet,1);
 
+
+tr2=find(pkspikeratedet(1,:)==0);
+tr2=max(tr2);
 for j = 1:maxiter
-    pkspikshift(j) = I(transitionend(j)) - I(251);
+    pkspikshift(j) = I(transitionend(j)) - I(tr2);
     I_shifted(j,:) = I - pkspikshift(j);
 end
 
@@ -2196,7 +2205,7 @@ for j = 1:maxiter
         PKamplmeanstoAVG(j,k)= mean([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)]);
         PKamplmeanstoSEM(j,k)= std([PKamplmeansto1(j,k) PKamplmeansto2(j,k) PKamplmeansto3(j,k) PKamplmeansto4(j,k) PKamplmeansto5(j,k)])/sqrt(5);
     end
-    transitionend(j) = find(CDtstat(j,:)==max(CDtstat(j,:)));
+    transitionend(j) = find(abs(CDtstat(j,:))==max(abs(CDtstat(j,:))));
     transitionend_p(j) = CDpsto(j,transitionend(j));
 end
 
@@ -2239,8 +2248,10 @@ meanIEItrdet=mean(meanIEItrdet,1);meanpktimedet=mean(meanpktimedet,1);meantrtime
 PKamplmeandet=mean(PKamplmeandet,1);pkdiffusiondet=mean(pkdiffusiondet,1);pkIEIspikeratiodet=mean(pkIEIspikeratiodet,1);
 pktcorrdet=mean(pktcorrdet,1);trdiffusiondet=mean(trdiffusiondet,1);trtcorrdet=mean(trtcorrdet,1);
 
+tr2=find(pkspikeratedet(1,:)==0);
+tr2=min(tr2);
 for j = 1:maxiter
-    pkspikshift(j) = I(transitionend(j)) - I(251);
+    pkspikshift(j) = I(transitionend(j)) - I(tr2);
     I_shifted(j,:) = I - pkspikshift(j);
 end
 
@@ -2251,6 +2262,7 @@ close all;
 mustart=350;muend=500;
 
 figure(1);
+subplot(2,1,1);
 plot(mu,pkspikeratedet(1,:),'k');
 set(0,'DefaultAxesColorOrder',cool(4));
 for j = 1:maxiter
@@ -2277,7 +2289,18 @@ if forcestiff==1
 elseif forcestiff==2
     xlabel('Stiffness');ylabel('Spike Rate (spikes/sec)');
 end
+title('Hair Bundle Model; Averages = 5');
 
+subplot(2,1,2);
+plot(I,pkspikeratedet(1,:),'k');
+set(0,'DefaultAxesColorOrder',cool(4));
+for j = 1:maxiter
+    hold all;
+    ha=plot(I_shifted(j,:),pkspikeratestoAVG(j,:));
+end
+legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
+axis([mu(1) mu(end) 0 max(max(pkspikeratestoAVG))]);
+xlabel('Control Parameter (shifted)');ylabel('Spike Rate (spikes/sec)');
 title('Hair Bundle Model; Averages = 5');
 
 

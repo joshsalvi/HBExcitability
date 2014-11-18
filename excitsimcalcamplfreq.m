@@ -266,10 +266,11 @@ for j = 1:length(Xsto)
         fstoind = find(fstofft{j,k} > 0.0001);
         [Xdetfft{j,k}, fdetfft{j,k}] = pwelch(Xdet{j}{k},winfunc,noverlap,NPSD,Fs);
         fdetind = find(fdetfft{j,k} > 0.0001);
-        fscale = 1;
+        fscale = 1e3;
         Xstofft{j,k} = Xstofft{j,k}./fscale;
         Xdetfft{j,k} = Xdetfft{j,k}./fscale;
-        if max(2*abs(Xstofft{j,k})) > 1e-2
+        % Is the peak a minimum height? If not, set ampl/freq to zero.
+        if max(2*abs(Xstofft{j,k})) > 1e-3
         Xstofftmaxind = find(Xstofft{j,k}(fstoind)==max(Xstofft{j,k}(fstoind)));
         Xdetfftmaxind = find(Xdetfft{j,k}(fdetind)==max(Xdetfft{j,k}(fdetind)));
         fftamplsto(j,k) = Xstofft{j,k}(fstoind(Xstofftmaxind(1)));
@@ -279,6 +280,22 @@ for j = 1:length(Xsto)
         
         fftfreqsto(j,k) = fstofft{j,k}(fstoind(Xstofftmaxind(1)));
         fftfreqdet(j,k) = fdetfft{j,k}(fdetind(Xdetfftmaxind(1)));
+        % Find mean and standard deviation of noise far away from peak
+        fftstomean = mean(Xstofft{j,k}(fstoind(Xstofftmaxind(1))+1000:fstoind(Xstofftmaxind(1))+2000));
+        fftstostd = std(Xstofft{j,k}(fstoind(Xstofftmaxind(1))+1000:fstoind(Xstofftmaxind(1))+2000));
+        fftdetmean = mean(Xdetfft{j,k}(fstoind(Xdetfftmaxind(1))+1000:fstoind(Xdetfftmaxind(1))+2000));
+        fftdetstd = std(Xdetfft{j,k}(fstoind(Xdetfftmaxind(1))+1000:fstoind(Xdetfftmaxind(1))+2000));
+        % Is peak greater than mean plus std? If not, set ampl/freq to
+        % zero.
+        if fftamplsto(j,k) < (fftstomean+fftstostd)
+            fftamplsto(j,k) = 0;
+            fftfreqsto(j,k) = 0;
+        end
+        if fftampldet(j,k) < (fftdetmean+fftdetstd)
+            fftampldet(j,k) = 0;
+            fftfreqdet(j,k) = 0;
+        end
+        
         else
         fftfreqsto(j,k) = 0;
         fftfreqdet(j,k) = 0;
