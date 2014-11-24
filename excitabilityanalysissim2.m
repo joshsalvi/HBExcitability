@@ -322,7 +322,7 @@ end
 if saveyn == 1
     disp('Saving...');
     filename2 = filename(1:end-4);
-    save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12thresh),'-biftype',num2str(biftype),'.mat'))
+    save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12thresh),'-biftype',num2str(biftype),'.mat'),'-v7.3')
     disp('Finished.');
 else
     disp('Not saved.');

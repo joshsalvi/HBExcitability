@@ -26,7 +26,7 @@ end
 end 
 % Calculate the time for each peak and trough
 sizeP = size(pksto);
-nperc = 0.7; % percentage for threshold
+nperc = 0.5; % percentage for threshold
 for j = 1:sizeP(1)
     for k = 1:sizeP(2)
       if isempty(pksto{j,k}) == 0 && isempty(trsto{j,k}) == 0
