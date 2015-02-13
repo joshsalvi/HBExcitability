@@ -1,4 +1,4 @@
-function [threshrec, noisefloor, totpower, frdetnoise, frstonoise, frdettot, frstotot, const] = findthreshsim(filename,dwnspl,biftype,stiffind,offset)
+function [threshrec, noisefloor, totpower, frdetnoise, frstonoise, frdettot, frstotot, const] = findthreshsim2(filename,dwnspl,biftype,stiffind,offset)
 % This function finds the noise floor for simulation data in order to
 % calculate the threshold required for a peak-finding algorithm. The
 % function also calculates the total power in the signal as the upper bound
@@ -180,22 +180,22 @@ for j = 1:length(Xsto)
         
         %}
         
-        % Take mean up to half of the Nyquist frequency
-        fftstomean = mean(Xstofft{j,k}(1:fnyq));
-        fftstostd = std(Xstofft{j,k}(1:fnyq));
-        fftdetmean = mean(Xdetfft{j,k}(1:fnyq));
-        fftdetstd = std(Xdetfft{j,k}(1:fnyq));
+        % Take median and mad up to half of the Nyquist frequency
+        fftstomed = median(Xstofft{j,k}(1:fnyq));
+        fftstomad = mad(Xstofft{j,k}(1:fnyq));
+        fftdetmed = median(Xdetfft{j,k}(1:fnyq));
+        fftdetmad = mad(Xdetfft{j,k}(1:fnyq));
         stomax(j,k) = Xstomax;
         detmax(j,k) = Xdetmax;
         % Remove peak
         if biftype == 4 || biftype == 1
-        frsto(frsto>(fftstomean+2*fftstostd))=0;
-        frdet(frdet>(fftdetmean+2*fftdetstd))=0;
+        frsto(frsto>(fftstomed+2*fftstomad))=0;
+        frdet(frdet>(fftdetmed+2*fftdetmad))=0;
         %frsto=sqrt(frsto);
         %frdet=sqrt(frdet);
         else
-        frsto(frsto>(fftstomean+2*fftstostd))=0;
-        frdet(frdet>(fftdetmean+2*fftdetstd))=0; 
+        frsto(frsto>(fftstomed+2*fftstomad))=0;
+        frdet(frdet>(fftdetmed+2*fftdetmad))=0; 
         end
         
         %}
@@ -212,10 +212,10 @@ for j = 1:length(Xsto)
         frdetnoise(j,k) = 0;
         end
         clear xstosmooth xdetsmooth
-       % xstosmooth = smooth(Xsto{j}{k}(1,:),ceil(Fs/fsmooth));
-        %xdetsmooth = smooth(Xdet{j}{k}(1,:),ceil(Fs/fsmooth));
-        %xstovar(j,k) = std(xstosmooth(round(L/4):round(3*L/4))-mean(xstosmooth(round(L/4):round(3*L/4))));
-        %xdetvar(j,k) = std(xdetsmooth(round(L/4):round(3*L/4))-mean(xdetsmooth(round(L/4):round(3*L/4))));
+        xstosmooth = smooth(Xsto{j}{k}(1,:),ceil(Fs/fsmooth));
+        xdetsmooth = smooth(Xdet{j}{k}(1,:),ceil(Fs/fsmooth));
+        xstovar(j,k) = std(xstosmooth(round(L/4):round(3*L/4))-mean(xstosmooth(round(L/4):round(3*L/4))));
+        xdetvar(j,k) = std(xdetsmooth(round(L/4):round(3*L/4))-mean(xdetsmooth(round(L/4):round(3*L/4))));
     end
 end
 
@@ -228,12 +228,9 @@ for j = 1:length(Xsto)
 
 
 powdiff(j) = totpower(j,1)-noisefloor(j,1);
-powdiff2(j) = max(stomax(j,:))-max(noisefloor(j,1));
 M = 3;
 for m = 1:M
-    threshrec{1}(j,m) = m*powdiff(j)/4+max(noisefloor(j,1));
-    threshrec{2}(j,m) = m*powdiff2(j)/4+max(noisefloor(j,1));
-    threshrec{3}(j,m) = m*noisefloorSTD(j,1)+max(noisefloor(j,1));
+    threshrec(j,m) = m*powdiff(j)/4+max(noisefloor(j,1));
 end
 end
 c1=0;c2=0;

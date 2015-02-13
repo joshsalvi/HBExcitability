@@ -4,12 +4,13 @@ function [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalys
 %
 % [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
 % 
-% Ex. excitabilityanalysissim2('/Users/joshsalvi/Desktop/Hopf/Hopfstochoutput4-finemu-analyzed-dwnspl10.mat',10,1,1)
+% Ex. excitabilityanalysissim2('/Users/joshsalvi/Desktop/Hopf/Hopfstochoutput4-finemu-analyzed-dwnspl10.mat',10,1,[0.1 0.2 0.3 0.4],0,1)
 %
 % filename: name of MAT file with directory
 % dwnspl: downsampling rate
 % biftype: 1=supercritical Hopf, 2=SNIC, 3=subcritical Hopf, 4=hb model
-% c12thresh: manual threshold for peak detection
+% c12thresh: manual threshold for peak detection (input values for each
+% noise level)
 %
 %
 % jsalvi@rockefeller.edu
@@ -119,7 +120,7 @@ IEIpksto = cell(length(Xdet),length(Xdet{1}));IEItrsto = cell(length(Xdet),lengt
 NNerr = 10^-6;   % error threshold for nearest-neighbor clustering
 for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
-            [pkdet{j,k},trdet{j,k}] = PTDetect(Xdet{j}{k}, c12thresh);
+            [pkdet{j,k},trdet{j,k}] = PTDetect(Xdet{j}{k}, c12thresh(j));
             for l = 2:length(pkdet{j,k})
                 IEIpkdet{j,k}(l-1) = (pkdet{j,k}(l) - pkdet{j,k}(l-1))/Fs;
             end
@@ -127,7 +128,7 @@ for j = 1:length(Xdet)
                 IEItrdet{j,k}(l-1) = (trdet{j,k}(l) - trdet{j,k}(l-1))/Fs;
             end
             
-            [pksto{j,k},trsto{j,k}] = PTDetect(Xsto{j}{k}, c12thresh);
+            [pksto{j,k},trsto{j,k}] = PTDetect(Xsto{j}{k}, c12thresh(j));
             for l = 2:length(pksto{j,k})
                 IEIpksto{j,k}(l-1) = (pksto{j,k}(l) - pksto{j,k}(l-1))/Fs;
             end
@@ -243,7 +244,7 @@ NNerr = 10^-6;   % error threshold for nearest-neighbor clustering
 for j = 1:length(Xdet)
     for k = 1:length(Xdet{1})
         for l = 1:length(Xdet{1}{1})
-            [pkdet{j,k,l},trdet{j,k,l}] = PTDetect(Xdet{j}{k}{l}, c12thresh);
+            [pkdet{j,k,l},trdet{j,k,l}] = PTDetect(Xdet{j}{k}{l}, c12thresh(l));
             for m = 2:length(pkdet{j,k,l})
                 IEIpkdet{j,k,l}(m-1) = (pkdet{j,k,l}(m) - pkdet{j,k,l}(m-1))/Fs;
             end
@@ -251,7 +252,7 @@ for j = 1:length(Xdet)
                 IEItrdet{j,k,l}(m-1) = (trdet{j,k,l}(m) - trdet{j,k,l}(m-1))/Fs;
             end
             
-            [pksto{j,k,l},trsto{j,k,l}] = PTDetect(Xsto{j}{k}{l}, c12thresh);
+            [pksto{j,k,l},trsto{j,k,l}] = PTDetect(Xsto{j}{k}{l}, c12thresh(l));
             for m = 2:length(pksto{j,k,l})
                 IEIpksto{j,k,l}(m-1) = (pksto{j,k,l}(m) - pksto{j,k,l}(m-1))/Fs;
             end
