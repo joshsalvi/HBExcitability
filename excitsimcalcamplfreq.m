@@ -11,7 +11,7 @@ function excitsimcalcamplfreq(filename1,biftype,stiffind)
 % jsalvi@rockefeller.edu
 load(filename1)
 
-if biftype == 1 || biftype == 2 || biftype == 3
+if biftype == 1 || biftype == 2 || biftype == 3 || biftype == 5
     stiffind=1;
 elseif biftype == 4
         Xsto1=Xsto; Xdet1=Xdet; pksto1=pksto;pkdet1=pkdet;trsto1=trsto;trdet1=trdet;clear Xdet Xsto pkdet pksto trdet trsto;

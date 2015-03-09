@@ -113,7 +113,7 @@ XsegL = floor(length(Xsto{1}{1})/nw);
 welchwin = round(XsegL);
 NPSD = floor(NFFT/nw);
 noverlap = 0;
-winfunc = hamming(welchwin);
+winfunc = rectwin(welchwin);
 freq = 0.005;
 Xsine = sin(2*pi*freq.*t);
 [Xsinepsd,~] = pwelch(Xsine,winfunc,noverlap,NPSD,Fs);
@@ -203,10 +203,10 @@ for j = 1:length(Xsto)
         frsto(frsto>(Xstomax*0.5))=0;
         frdet(frdet>(Xdetmax*0.5))=0;
         %}
-        frstonoise(j,k) = sum(frsto(1:fnyq));               % find noise floor (Parseval's Theorem)
-        frdetnoise(j,k) = sum(frdet(1:fnyq));
-        frstotot(j,k) = sum(Xstofft{j,k}(1:fnyq));          % find total variance (Parseval's Theorem)
-        frdettot(j,k) = sum(Xdetfft{j,k}(1:fnyq));
+        frstonoise(j,k) = sqrt(sum(frsto(1:fnyq)));               % find noise floor (Parseval's Theorem)
+        frdetnoise(j,k) = sqrt(sum(frdet(1:fnyq)));
+        frstotot(j,k) = sqrt(sum(Xstofft{j,k}(1:fnyq)));          % find total variance (Parseval's Theorem)
+        frdettot(j,k) = sqrt(sum(Xdetfft{j,k}(1:fnyq)));
         else
         frstonoise(j,k) = 0;
         frdetnoise(j,k) = 0;

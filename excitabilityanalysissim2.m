@@ -23,7 +23,7 @@ load(filename);
 %load(file);
 
 % Type of bifurcation
-        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf
+        % 1=supercritical Hopf; 2=SNIC; 3=subcritical Hopf, % 4=HB model
 if biftype == 1
     Xdet1 = Xdet; Xsto1 = Xsto;
     clear i;
@@ -52,23 +52,31 @@ elseif biftype == 3
     end
     clear Xdet1 Xsto1
 elseif biftype == 4
-    sizeX = size(Xdet);
-    Xdet1 = Xdet; Xsto1 = Xsto;
+    Xsto1=Xsto; Xdet1=Xdet;clear Xdet Xsto;
+    sizeX = size(Xdet1);
+for j = 1:sizeX(1)       % Isolate the appropriate index
+    for m = 1:sizeX(3)
+        Xsto{m}{j} = Xsto1{j,stiffind,m}(1,1:dwnspl:end) + offset;
+        Xdet{m}{j} = Xdet1{j,stiffind,m}(1,1:dwnspl:end) + offset;
+    end
+end
+elseif biftype == 5
+    Xsto1=Xsto;Xdet1=Xdet;
     clear Xdet Xsto
+    sizeX = size(Xdet1);
     for j = 1:sizeX(1)
         for k = 1:sizeX(2)
-            for l = 1:sizeX(3)
-                Xdet{j}{k}{l} = Xdet1{j,k,l}(1,1:dwnspl:end) + offset;
-                Xsto{j}{k}{l} = Xsto1{j,k,l}(1,1:dwnspl:end) + offset;
-            end
+            Xsto{k}{j} = Xsto1{j,k}(1,1:dwnspl:end) + offset;
+            Xdet{k}{j} = Xdet1{j,k}(1,1:dwnspl:end) + offset;
         end
     end
-    clear Xdet1 Xsto1
+    
 else
     disp('No bifurcation type chosen');
 end
 
-if biftype == 1 || biftype == 2 || biftype == 3
+
+if biftype == 1 || biftype == 2 || biftype == 3 || biftype == 5
 
 
 % Define time vector
@@ -197,7 +205,9 @@ else
 
 % Define time vector
 tvec=t(1:dwnspl:end);
+if dwnspl>1
 tvec=tvec(1:length(Xdet{1}{1}{1}));
+end
 % Define the sample rate if not already done
 Fs=1/(tvec(2)-tvec(1));
 
