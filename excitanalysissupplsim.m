@@ -15,9 +15,14 @@ function excitanalysissupplsim(directory,biftype,threshrange)
 
 %Fs = 1/t(2);
 dwnspl=1;offset=0;
-
-for j = 1:5
-    files{j} = dir([directory '*all-pt' num2str(j) '.mat']);
+if biftype ~= 1
+    for j = 1:5
+        files{j} = dir([directory '*-all-pt' num2str(j) '.mat']);
+    end
+else
+    for j = 1:5
+        files{j} = dir([directory '*-pt' num2str(j) '.mat']);
+    end
 end
 
 
@@ -37,6 +42,7 @@ for m = 1:5
         Xlowsto = zeros(5,length(Xdet),length(Xdet{1}));Xlowdet = zeros(5,length(Xdet),length(Xdet{1}));
         Qdet = zeros(5,length(Xdet),length(Xdet{1}));Qsto = zeros(5,length(Xdet),length(Xdet{1}));
         Xupsto = zeros(5,length(Xdet),length(Xdet{1}));Xupdet = zeros(5,length(Xdet),length(Xdet{1}));
+        CDdetpk = cell(5,length(threshrange));CDstopk = cell(5,length(threshrange));
     end
     if exist('mu') == 0
     if exist('I') == 1
@@ -99,6 +105,15 @@ else
     disp('No bifurcation type chosen');
     end
     
+    if m == 1
+        for j = 1:5
+            for k = 1:length(threshrange)
+                CDdetpk{j,k} = zeros(length(Xdet),length(Xdet{1}));
+                CDstopk{j,k} = zeros(length(Xdet),length(Xdet{1}));
+            end
+        end
+    end
+    
     for n = 1:length(threshrange)
         clear IEIpkdet IEIpksto pkd pks
         IEIpkdet = cell(length(Xdet),length(Xdet{1}));IEIpksto = cell(length(Xdet),length(Xdet{1}));
@@ -130,9 +145,12 @@ else
                 xdetphase = atan2(imag(xdethilb),real(xdethilb));
                 xstophase = atan2(imag(xstohilb),real(xstohilb));
                 clear i;
-                VSdet(n,j,k) = abs(1/length(xdetphase)*sum(exp(i*xdetphase))); % vector strength (det)
-                VSsto(n,j,k) = abs(1/length(xstophase)*sum(exp(i*xstophase))); % vector strength (sto)
+                VSdet(m,j,k) = abs(1/length(xdetphase)*sum(exp(i*xdetphase))); % vector strength (det)
+                VSsto(m,j,k) = abs(1/length(xstophase)*sum(exp(i*xstophase))); % vector strength (sto)
             end
+        end
+        if mod(n,5)==0
+            disp(['n = ' num2str(n) '/' num2str(length(threshrange))]);
         end
     end
     if exist('t') == 0
@@ -234,19 +252,33 @@ else
            
         end
     end
-    
+disp(['m = ' num2str(m) '/5']);
+disp(['Saving' num2str(m) '...']);
+save([directory 'output' num2str(m) '.mat'],'Qsto','Qdet','VSdet','VSsto','CDdetpk','CDstopk','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft');
+disp('Finished.');
 end
 
 %Pre-allocate memory
 mu1d = zeros(length(threshrange),length(Xdet));mu1s = zeros(length(threshrange),length(Xdet));
 CD1d = zeros(length(threshrange),length(Xdet));CD1s = zeros(length(threshrange),length(Xdet));
-for n = 1:length(threshrange)
-    for j = 1:length(Xdet)
-        for k = 1:length(Xdet{1})
+sizeC1 = size(CDdetpk);
+sizeC2 = size(CDdetpk{1,1});
+
+for n = 1:sizeC1(1)
+    for j = 1:sizeC2(1)
+        for k = 1:sizeC2(2)
             CDdetmean{n}(j,k) = mean([CDdetpk{1,n}(j,k) CDdetpk{2,n}(j,k) CDdetpk{3,n}(j,k) CDdetpk{4,n}(j,k) CDdetpk{5,n}(j,k)]);
             CDdetsem{n}(j,k) = std([CDdetpk{1,n}(j,k) CDdetpk{2,n}(j,k) CDdetpk{3,n}(j,k) CDdetpk{4,n}(j,k) CDdetpk{5,n}(j,k)])/sqrt(5);
             CDstomean{n}(j,k) = mean([CDstopk{1,n}(j,k) CDstopk{2,n}(j,k) CDstopk{3,n}(j,k) CDstopk{4,n}(j,k) CDstopk{5,n}(j,k)]);
             CDstosem{n}(j,k) = std([CDstopk{1,n}(j,k) CDstopk{2,n}(j,k) CDstopk{3,n}(j,k) CDstopk{4,n}(j,k) CDstopk{5,n}(j,k)])/sqrt(5);
+            Qdetmean(j,k) = mean([Qdet(1,j,k) Qdet(2,j,k) Qdet(3,j,k) Qdet(4,j,k) Qdet(5,j,k)]);
+            Qdetsem(j,k) = std([Qdet(1,j,k) Qdet(2,j,k) Qdet(3,j,k) Qdet(4,j,k) Qdet(5,j,k)])/sqrt(5);
+            Qstomean(j,k) = mean([Qsto(1,j,k) Qsto(2,j,k) Qsto(3,j,k) Qsto(4,j,k) Qsto(5,j,k)]);
+            Qstosem(j,k) = std([Qsto(1,j,k) Qsto(2,j,k) Qsto(3,j,k) Qsto(4,j,k) Qsto(5,j,k)])/sqrt(5);
+            VSdetmean(j,k) = mean([VSdet(1,j,k) VSdet(2,j,k) VSdet(3,j,k) VSdet(4,j,k) VSdet(5,j,k)]);
+            VSstomean(j,k) = mean([VSsto(1,j,k) VSsto(2,j,k) VSsto(3,j,k) VSsto(4,j,k) VSsto(5,j,k)]);
+            VSdetsem(j,k) = std([VSdet(1,j,k) VSdet(2,j,k) VSdet(3,j,k) VSdet(4,j,k) VSdet(5,j,k)])/sqrt(5);
+            VSstosem(j,k) = std([VSsto(1,j,k) VSsto(2,j,k) VSsto(3,j,k) VSsto(4,j,k) VSsto(5,j,k)])/sqrt(5);
         end
         CD1d1 = findnearest(CDdetmean{n}(j,:),1);CD1d(n,j)=CDdetmean(CD1d1(1));
         mu1d(n,j) = mu(CD1d1(1));       % control parameter at which CD ~ 1 (deterministic)
@@ -255,4 +287,6 @@ for n = 1:length(threshrange)
     end
 end
 
-save([directory 'output1.mat'],'Qsto','Qdet','VSdet','VSsto','mu1s','mu1d','CDdetmean','CDdetsem','CDstomean','CDstosem');
+disp('Saving...');
+save([directory 'outputALL.mat'],'Qsto','Qdet','VSdet','VSsto','mu1s','mu1d','CDdetmean','CDdetsem','CDstomean','CDstosem','Qstomean','Qstosem','Qdetmean','Qdetsem','VSdetmean','VSdetsem','VSstomean','VSstosem','dipsto','dipdet','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft');
+disp('Finished.');

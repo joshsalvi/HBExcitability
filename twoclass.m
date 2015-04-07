@@ -11,8 +11,8 @@ function [c1,c2]=twoclass(x,e)
 
 c1=x(1); lastc1=c1;
 c2=x(2); lastc2=c2;
-
-while 1
+n=1;
+while n<100
     class1=[]; class2=[];
     for i = 1:length(x)
         if (abs(c1-x(i)) < abs(c2-x(i)))
@@ -26,4 +26,6 @@ while 1
         return;
     end
     lastc2=c2; lastc1=c1;
+    n=n+1;
 end
+
