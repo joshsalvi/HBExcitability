@@ -1,8 +1,8 @@
-function [pkspikeratedet, CDdetpk, fftampldet, fftfreqdet, PKamplmeandet, c1det, c2det] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,scaleyn,cellyn,saveyn)
+function [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet c1det c2det] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,scaleyn,saveyn)
 % This function imports raw data and performs a peak-finding algorithm
 % analysis. 
 %
-% [pkspikeratedet, CDdetpk, fftampldet, fftfreqdet, PKamplmeandet, c1det, c2det] = excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,scaleyn,cellyn,saveyn)
+% [pkspikeratedet CDdetpk fftampldet fftfreqdet PKamplmeandet]= excitabilityanalysisdata(filepath,dwnspl,offset,nnthresh,c12thresh,saveyn)
 %
 % Ex. [pks, CD, PSDfreqampl] = excitabilityanalysisdata('/Users/joshsalvi/Documents/Lab/Lab/Clamp
 % Data/2014-09-30.01/Ear 1/Cell 2/', 10,0,0);
@@ -15,7 +15,6 @@ function [pkspikeratedet, CDdetpk, fftampldet, fftfreqdet, PKamplmeandet, c1det,
 % c12thresh : threshold based upon nnthresh (index number or threshold
 % value) - if index number use the form [a b]
 % scaleyn : use power spectra to rescale the data? (1=yes)
-% cellyn : data in cells? (1=yes, 0=no)
 % saveyn : save? (1=yes)
 %
 % If you want to perform a proper histogram analysis, modify the code to
@@ -33,7 +32,6 @@ tstart=1;
 if exist('Xd_pulse')==1
     Xd=Xd_pulse;
 end
-if cellyn == 0
 % Downsample data
 for j = 1:a
     for i = 1:(logdata.data(1,8))
@@ -42,17 +40,7 @@ for j = 1:a
         Xd_dwnspl{i}{j} = Xd_dwnspl{i}{j} - smooth(Xd_dwnspl{i}{j},length(Xd_dwnspl{i}{j})/10) + offset;    % remove drift
     end
 end
-else
- % Downsample data
- sizeX=size(Xd);
-for i = 1:sizeX(1)
-    for j = 1:sizeX(2)
-        Xd_dwnspl{i}{j} = Xd{i,j}(tstart:dwnspl:length(Xd{1,1}));  % downsample
-        %Xd{i,j} = Xd{i,j} - smooth(Xd{i,j},length(Xd{i,j})/4) + offset;   % remove drift
-        Xd_dwnspl{i}{j} = Xd_dwnspl{i}{j} - smooth(Xd_dwnspl{i}{j},length(Xd_dwnspl{i}{j})/4) + offset;    % remove drift
-    end
-end
-end
+
 % Define time vector
 tvec=time(tstart:dwnspl:length(time));
 clear time;
@@ -354,7 +342,7 @@ for k = 1:a
     end
 end
 
-
+%{
 % Perform statistics on the distributions to see if they follow a Poisson
 % process.
 for k = 1:a
@@ -375,7 +363,7 @@ for j = 1:length(Xd_dwnspl)
         end
     end
 end
-
+%}
 
     
 % Generate a power spectrum for each case, find the peak in the power

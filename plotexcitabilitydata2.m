@@ -1,4 +1,4 @@
-biftype =1;
+biftype =2;
 forcestiff=1;
 hbcalc=1;
 
@@ -10,6 +10,9 @@ hbcalc=1;
 % Joshua D. Salvi
 % jsalvi@rockefeller.edu
 %
+if exist('I') == 0 && exist('mu') == 1
+    I=mu;
+end
 
 if biftype ==2
 % SNIC
@@ -107,7 +110,7 @@ end
 figure(1);
 subplot(2,1,1);
 plot(I,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -120,8 +123,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -131,7 +134,7 @@ title('SNIC Bifurcation; Averages = 5');
 
 subplot(2,1,2);
 plot(I,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
      ha=errorbar(I_shifted(j,:),pkspikeratestoAVG(j,:),pkspikeratestoSEM(j,:));
@@ -143,8 +146,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -171,8 +174,8 @@ title('SNIC Bifurcation; Averages = 5');
 figure(2);
 subplot(2,1,1);
 plot(I,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     hold all;
     plot(I,pkspikeratestoAVG(j,:));
@@ -186,8 +189,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -203,7 +206,7 @@ title('SNIC Bifurcation - Between Peaks; Averages = 5');
 figure(2)
 subplot(2,1,2);
 plot(I,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -217,8 +220,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -231,7 +234,7 @@ title('SNIC Bifurcation - Between Peaks; Averages = 5');
 figure(4)
 subplot(2,2,1);
 plot(I,CDpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(2,2,1);
     hold all;
@@ -246,8 +249,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -260,7 +263,7 @@ title('SNIC Bifurcation - PEAKS; Averages = 5');
 figure(4)
 subplot(2,2,2);
 plot(I,CDtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     subplot(2,2,2);
@@ -275,8 +278,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -289,8 +292,8 @@ title('SNIC Bifurcation - TROUGHS; Averages = 5');
 figure(4);
 subplot(2,2,3);
 plot(I,CVpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,3);
     hold all;
@@ -305,8 +308,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -322,8 +325,8 @@ title('SNIC Bifurcation - Each Peak; Averages = 5');
 figure(4);
 subplot(2,2,4);
 plot(I,CVtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,4);
     hold all;
@@ -338,8 +341,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -355,7 +358,7 @@ title('SNIC Bifurcation - Each Trough; Averages = 5');
 figure(5);
 subplot(3,1,2);
 plot(I,fftampldet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,2);
     hold all;
@@ -369,8 +372,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -382,7 +385,7 @@ title('SNIC Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,3);
 plot(I,fftfreqdet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,3);
     hold all;
@@ -396,8 +399,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -409,7 +412,7 @@ title('SNIC Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,1);
 plot(I,PKamplmeandet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,1);
     hold all;
@@ -423,8 +426,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -670,7 +673,7 @@ end
 figure(1);
 subplot(2,1,1);
 plot(mu,pkspikeratedet(1,:),'k');I=mu;
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(mu,pkspikeratestoAVG(j,:));
@@ -683,18 +686,18 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xleft)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.2;
+    Xdata(xright) = Xdata(xright)-0.2;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
-axis([mu(1) mu(end) 0 1.5*pkspikeratedet(1,findnearest(mu,1))]);
+axis([mu(1) mu(end) 0 2*max(max(pkspikeratesto))]);
 xlabel('Control Parameter');ylabel('Spike Rate (spikes/sec)');
 title('Hopf Bifurcation; Averages = 5');
 
 subplot(2,1,2);
 plot(I,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
      ha=errorbar(I_shifted(j,:),pkspikeratestoAVG(j,:),pkspikeratestoSEM(j,:));
@@ -706,8 +709,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -724,7 +727,7 @@ for j = 1:maxiter
     plot(fitsto{j});hold all;;
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4',sprintf('%s\n%s\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s','Deterministic','y=a*x^b+c','a=',num2str(fitdet.a),'b=',num2str(fitdet.b),'c=',num2str(fitdet.c),'R^2=',num2str(gofdet.rsquare)),sprintf('%s\n%s\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s','Noise=0.05','y=a*x^b+c','a=',num2str(fitsto{1}.a),'b=',num2str(fitsto{1}.b),'c=',num2str(fitsto{1}.c),'R^2=',num2str(gofsto{1}.rsquare)),sprintf('%s\n%s\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s','Noise=0.1','y=a*x^b+c','a=',num2str(fitsto{2}.a),'b=',num2str(fitsto{2}.b),'c=',num2str(fitsto{2}.c),'R^2=',num2str(gofsto{2}.rsquare)),sprintf('%s\n%s\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s','Noise=0.2','y=a*x^b+c','a=',num2str(fitsto{3}.a),'b=',num2str(fitsto{3}.b),'c=',num2str(fitsto{3}.c),'R^2=',num2str(gofsto{3}.rsquare)),sprintf('%s\n%s\n%s%s\n%s%s\n%s%s\n%s%s\n%s%s','Noise=0.4','y=a*x^b+c','a=',num2str(fitsto{4}.a),'b=',num2str(fitsto{4}.b),'c=',num2str(fitsto{4}.c),'R^2=',num2str(gofsto{4}.rsquare)));
-axis([mu(1) mu(end) 0 1.5*pkspikeratedet(1,findnearest(mu,1))]);
+axis([mu(1) mu(end) 0 2*max(max(pkspikeratesto))]);
 xlabel('Control Parameter');ylabel('Spike Rate (spikes/sec)');
 title('Hopf Bifurcation; Averages = 5');
 %}
@@ -732,8 +735,8 @@ title('Hopf Bifurcation; Averages = 5');
 figure(2);
 subplot(2,1,1);
 plot(mu,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -747,8 +750,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -763,7 +766,7 @@ title('Hopf Bifurcation; Averages = 5');
 figure(2);
 subplot(2,1,2);
 plot(mu,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -777,8 +780,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(mu,ones(1,length(mu)),'g--');
@@ -792,7 +795,7 @@ title('Hopf Bifurcation; Averages = 5');
 figure(4)
 subplot(2,2,1);
 plot(I,CDpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(2,2,1);
     hold all;
@@ -807,8 +810,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -821,7 +824,7 @@ title('Hopf Bifurcation - PEAKS; Averages = 5');
 figure(4)
 subplot(2,2,2);
 plot(I,CDtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     subplot(2,2,2);
@@ -836,8 +839,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -850,8 +853,8 @@ title('Hopf Bifurcation - TROUGHS; Averages = 5');
 figure(4);
 subplot(2,2,3);
 plot(I,CVpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,3);
     hold all;
@@ -866,8 +869,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -883,8 +886,8 @@ title('Hopf Bifurcation - Each Peak; Averages = 5');
 figure(4);
 subplot(2,2,4);
 plot(I,CVtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,4);
     hold all;
@@ -899,8 +902,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -916,7 +919,7 @@ title('Hopf Bifurcation - Each Trough; Averages = 5');
 figure(5);
 subplot(3,1,2);
 plot(I,fftampldet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,2);
     hold all;
@@ -930,8 +933,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -943,7 +946,7 @@ title('Hopf Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,3);
 plot(I,fftfreqdet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,3);
     hold all;
@@ -957,8 +960,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -970,7 +973,7 @@ title('Hopf Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,1);
 plot(I,PKamplmeandet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,1);
     hold all;
@@ -984,8 +987,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -995,13 +998,15 @@ title('Hopf Bifurcation; Averages = 5');
 
 
 
-Iselected = [-1 -0.5 -0.3 -0.1 -0.05 -0.01 0.01 0.05 0.1 0.2]; % CHOOSE
+Iselected = [17 18.5 19.5 20 20.5 20.7 20.8 20.9 21.5 22]; % CHOOSE
 clear Iselect
 for k = 1:length(Iselected)
     Iselect(k) = max(findnearest(I,Iselected(k)));
+    maxx(k) = max([max(abs(Xsto{1}{Iselect(k)})) max(abs(Xsto{2}{Iselect(k)})) max(abs(Xsto{3}{Iselect(k)})) max(abs(Xsto{4}{Iselect(k)}))]);
 end
+maxy=max(maxx);
 tmin=10000;tmax=15000;    % CHOOSE
-ymin=-2;ymax=2;
+ymin=-1.2*maxy;ymax=1.2*maxy;
 yimin=ymin*2;yimax=ymax*2;
 dwnsplquiver=1;quiverstart=2000;quiverend=2050;quiverscale=1;
 dwnsplrealimag=1;realimagstart=2000;realimagend=4000;
@@ -1231,7 +1236,7 @@ end
 figure(1);
 subplot(2,1,1);
 plot(mu,pkspikeratedet(1,:),'k');I=mu;
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(mu,pkspikeratestoAVG(j,:));
@@ -1244,18 +1249,18 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
-axis([mu(1) mu(end) 0 1.5*pkspikeratedet(1,findnearest(mu,1))]);
+axis([mu(1) mu(end) 0 2*max(max(pkspikeratesto))]);
 xlabel('Control Parameter');ylabel('Spike Rate (spikes/sec)');
 title('Subcritical Hopf Bifurcation; Averages = 5');
 
 subplot(2,1,2);
 plot(I,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
      ha=errorbar(I_shifted(j,:),pkspikeratestoAVG(j,:),pkspikeratestoSEM(j,:));
@@ -1267,8 +1272,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -1294,8 +1299,8 @@ title('Subcritical Hopf Bifurcation; Averages = 5');
 figure(2);
 subplot(2,1,1);
 plot(I,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     hold all;
     plot(I,pkspikeratestoAVG(j,:));
@@ -1309,8 +1314,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -1326,7 +1331,7 @@ title('Subcritical Hopf Bifurcation - Between Peaks; Averages = 5');
 figure(2)
 subplot(2,1,2);
 plot(I,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -1340,8 +1345,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -1354,7 +1359,7 @@ title('Subcritical Hopf Bifurcation - Between Peaks; Averages = 5');
 figure(4)
 subplot(2,2,1);
 plot(I,CDpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(2,2,1);
     hold all;
@@ -1369,8 +1374,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -1383,7 +1388,7 @@ title('Subcritical Hopf Bifurcation - PEAKS; Averages = 5');
 figure(4)
 subplot(2,2,2);
 plot(I,CDtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     subplot(2,2,2);
@@ -1398,8 +1403,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 plot(I,ones(1,length(I)),'g--');
@@ -1412,8 +1417,8 @@ title('Subcritical Hopf Bifurcation - TROUGHS; Averages = 5');
 figure(4);
 subplot(2,2,3);
 plot(I,CVpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,3);
     hold all;
@@ -1428,8 +1433,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -1445,8 +1450,8 @@ title('Subcritical Hopf Bifurcation - Each Peak; Averages = 5');
 figure(4);
 subplot(2,2,4);
 plot(I,CVtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,4);
     hold all;
@@ -1461,8 +1466,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 for j = 1:maxiter
@@ -1478,7 +1483,7 @@ title('Subcritical Hopf Bifurcation - Each Trough; Averages = 5');
 figure(5);
 subplot(3,1,2);
 plot(I,fftampldet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,2);
     hold all;
@@ -1492,8 +1497,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -1505,7 +1510,7 @@ title('Subcritical Hopf Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,3);
 plot(I,fftfreqdet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,3);
     hold all;
@@ -1519,8 +1524,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -1532,7 +1537,7 @@ title('Subcritical Hopf Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,1);
 plot(I,PKamplmeandet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,1);
     hold all;
@@ -1546,8 +1551,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -1782,9 +1787,9 @@ end
 
 figure(1);
 subplot(2,1,1);
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 plot(mu,pkspikeratedet(1,:),'k');I=mu;
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(mu,pkspikeratestoAVG(j,:));
@@ -1808,7 +1813,7 @@ title('Fold Bifurcation; Averages = 5');
 
 subplot(2,1,2);
 plot(I,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
      ha=errorbar(I_shifted(j,:),pkspikeratestoAVG(j,:),pkspikeratestoSEM(j,:));
@@ -1847,8 +1852,8 @@ title('Fold Bifurcation; Averages = 5');
 figure(2);
 subplot(2,1,1);
 plot(I,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     hold all;
     plot(I,pkspikeratestoAVG(j,:));
@@ -1879,7 +1884,7 @@ title('Cusp Bifurcation - Between Peaks; Averages = 5');
 figure(2)
 subplot(2,1,2);
 plot(I,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -1907,7 +1912,7 @@ title('Cusp Bifurcation - Between Peaks; Averages = 5');
 figure(4)
 subplot(2,2,1);
 plot(I,CDpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(2,2,1);
     hold all;
@@ -1936,7 +1941,7 @@ title('Cusp Bifurcation - PEAKS; Averages = 5');
 figure(4)
 subplot(2,2,2);
 plot(I,CDtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     subplot(2,2,2);
@@ -1965,8 +1970,8 @@ title('Cusp Bifurcation - TROUGHS; Averages = 5');
 figure(4);
 subplot(2,2,3);
 plot(I,CVpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,3);
     hold all;
@@ -1998,8 +2003,8 @@ title('Cusp Bifurcation - Each Peak; Averages = 5');
 figure(4);
 subplot(2,2,4);
 plot(I,CVtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,4);
     hold all;
@@ -2031,7 +2036,7 @@ title('Cusp Bifurcation - Each Trough; Averages = 5');
 figure(5);
 subplot(3,1,2);
 plot(I,fftampldet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,2);
     hold all;
@@ -2058,7 +2063,7 @@ title('Cusp Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,3);
 plot(I,fftfreqdet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,3);
     hold all;
@@ -2085,7 +2090,7 @@ title('Cusp Bifurcation; Averages = 5');
 figure(5);
 subplot(3,1,1);
 plot(I,PKamplmeandet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,1);
     hold all;
@@ -2109,7 +2114,7 @@ xlabel('Control Parameter');ylabel('Peak-to-Trough Amplitude');
 title('Cusp Bifurcation; Averages = 5');
 
 
-Iselected = [-0.25 -0.2 -0.15 -0.1 -0.05 -0.04 -0.03 -0.02 -0.01 0]; % CHOOSE
+Iselected = [-0.25 -0.2 -0.15 -0.1 -0.05 -0.04 -0.03 -0.1 -0.01 0]; % CHOOSE
 clear Iselect
 for k = 1:length(Iselected)
     Iselect(k) = max(findnearest(I,Iselected(k)));
@@ -2384,7 +2389,7 @@ mustart=350;muend=500;
 figure(1);
 subplot(2,1,1);
 plot(mu,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(mu,pkspikeratestoAVG(j,:));
@@ -2413,7 +2418,7 @@ title('Hair Bundle Model; Averages = 5');
 
 subplot(2,1,2);
 plot(I,pkspikeratedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
      ha=errorbar(I_shifted(j,:),pkspikeratestoAVG(j,:),pkspikeratestoSEM(j,:));
@@ -2425,8 +2430,8 @@ for j = 1:maxiter
     %  endpoints of the horizontal lines
     xleft = temp; xright = temp+1; 
     % Change line length
-    Xdata(xleft) = Xdata(xleft)+0.02;
-    Xdata(xright) = Xdata(xright)-0.02;
+    Xdata(xleft) = Xdata(xleft)+0.1;
+    Xdata(xright) = Xdata(xright)-0.1;
     set(hb(2),'Xdata',Xdata)
 end
 %legend('Deterministic','Noise = 0.05','Noise = 0.1','Noise = 0.2','Noise = 0.4');
@@ -2455,8 +2460,8 @@ title('Hair Bundle Model; Averages = 5 --- REVERSED FOR FITTING');
 
 figure(2);
 plot(mu,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -2484,7 +2489,7 @@ title('Hair Bundle Model; Averages = 5');
 
 figure(3)
 plot(mu,CDdetpk(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     %plot(I,pkspikeratestoAVG(j,:));
@@ -2512,7 +2517,7 @@ title('Hair Bundle Model; Averages = 5');
 figure(4)
 subplot(2,2,1);
 plot(I,CDpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(2,2,1);
     hold all;
@@ -2540,7 +2545,7 @@ title('Hair Bundle Model - PEAKS; Averages = 5');
 figure(4)
 subplot(2,2,2);
 plot(I,CDtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     hold all;
     subplot(2,2,2);
@@ -2568,8 +2573,8 @@ title('Hair Bundle Model - TROUGHS; Averages = 5');
 figure(4);
 subplot(2,2,3);
 plot(I,CVpktimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,3);
     hold all;
@@ -2600,8 +2605,8 @@ title('Hair Bundle Model - Each Peak; Averages = 5');
 figure(4);
 subplot(2,2,4);
 plot(I,CVtrtimedet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
-colors2=cool(4);
+set(0,'DefaultAxesColorOrder',ametrine(4));
+colors2=ametrine(4);
 for j = 1:maxiter
     subplot(2,2,4);
     hold all;
@@ -2632,7 +2637,7 @@ title('Hair Bundle Model - Each Trough; Averages = 5');
 figure(5);
 subplot(3,1,2);
 plot(I,smooth(fftampldet(1,:),5),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,2);
     hold all;
@@ -2659,7 +2664,7 @@ title('Hair Bundle Model; Averages = 5');
 figure(5);
 subplot(3,1,3);
 plot(I,fftfreqdet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,3);
     hold all;
@@ -2686,7 +2691,7 @@ title('Hair Bundle Model; Averages = 5');
 figure(5);
 subplot(3,1,1);
 plot(I,PKamplmeandet(1,:),'k');
-set(0,'DefaultAxesColorOrder',cool(4));
+set(0,'DefaultAxesColorOrder',ametrine(4));
 for j = 1:maxiter
     subplot(3,1,1);
     hold all;

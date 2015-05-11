@@ -1,28 +1,52 @@
-function excitanalysissupplsim(directory,biftype,threshrange)
+function excitanalysissupplsim(directory,biftype,threshrange,threshcheck,fftpkcheck)
 %
 % Finds additional metrics on simulated data from bifurcation normal forms.
 %
-% excitanalysissupplsim(directory,biftype,threshrange)
+% excitanalysissupplsim(directory,biftype,threshrange,threshcheck,fftpkcheck)
 %
 % Directory: The directory of the files to be searched e.g. '/Users/.../'
 % biftype: bifurcation type to be analyzed e.g. 1
 % threshrange: range of thresholds e.g. linspace(0.01,1,100)
+% threshcheck: check range of thresholds? (1=yes;0=no) default=1
+% fftpkcheck: check FFT? (1=yes;0=no) default=1
 %
 % Joshua D. Salvi
 % jsalvi@rockefeller.edu
 %
 
-
+if exist('threshcheck')==0
+    threshcheck=1;
+end
+if exist('fftpkcheck')==0
+    fftpkcheck=1;
+end
+    
 %Fs = 1/t(2);
 dwnspl=1;offset=0;
-if biftype ~= 1
+if biftype ~= 1 && isempty(dir([directory '*-rect-pt' num2str(1) '.mat']))==1
     for j = 1:5
         files{j} = dir([directory '*-all-pt' num2str(j) '.mat']);
     end
-else
+elseif biftype == 4
     for j = 1:5
         files{j} = dir([directory '*-pt' num2str(j) '.mat']);
     end
+elseif isempty(dir([directory '*-rect-pt' num2str(1) '.mat']))==0
+    for j = 1:5
+        files{j} = dir([directory '*-rect-pt' num2str(j) '.mat']);
+    end
+elseif isempty(findstr(directory,'offset')) == 1
+    for j = 1:5
+        files{j} = dir([directory '*-pt' num2str(j) '.mat']);
+    end
+else
+    for j = 1:5
+        files{j} = dir([directory '*-all-pt' num2str(j) '.mat']);
+    end
+end
+
+if biftype == 4
+    stiffind = input('Which index in stiffness? (1,2,3,4,5)...   ');
 end
 
 
@@ -44,16 +68,7 @@ for m = 1:5
         Xupsto = zeros(5,length(Xdet),length(Xdet{1}));Xupdet = zeros(5,length(Xdet),length(Xdet{1}));
         CDdetpk = cell(5,length(threshrange));CDstopk = cell(5,length(threshrange));
     end
-    if exist('mu') == 0
-    if exist('I') == 1
-        mu = I;
-    elseif exist('rt') == 1
-        mu = rt;
-    else 
-        disp('No control parameter exists');
-        break;
-    end
-    end
+    
     if biftype == 1
     Xdet1 = Xdet; Xsto1 = Xsto;
     clear i;
@@ -82,12 +97,19 @@ elseif biftype == 3
     end
     clear Xdet1 Xsto1
 elseif biftype == 4
-    Xsto1=Xsto; Xdet1=Xdet;clear Xdet Xsto;
+    if exist('Xsto')==1
+        Xsto1=Xsto; Xdet1=Xdet;clear Xdet Xsto;
+    end
+    if isempty (findstr([directory files{m}.name],'force')) == 0
+        mu = F; rt=mu; I=rt;
+    else
+        mu = ke; rt=mu; I=rt;
+    end
     sizeX = size(Xdet1);
 for j = 1:sizeX(1)       % Isolate the appropriate index
-    for m = 1:sizeX(3)
-        Xsto{m}{j} = Xsto1{j,stiffind,m}(1,1:dwnspl:end) + offset;
-        Xdet{m}{j} = Xdet1{j,stiffind,m}(1,1:dwnspl:end) + offset;
+    for qp = 1:sizeX(3)
+        Xsto{qp}{j} = Xsto1{j,stiffind,qp}(1,1:dwnspl:end) + offset;
+        Xdet{qp}{j} = Xdet1{j,stiffind,qp}(1,1:dwnspl:end) + offset;
     end
 end
 elseif biftype == 5
@@ -104,7 +126,16 @@ elseif biftype == 5
 else
     disp('No bifurcation type chosen');
     end
-    
+    if exist('mu') == 0
+    if exist('I') == 1
+        mu = I;
+    elseif exist('rt') == 1
+        mu = rt;
+    else 
+        disp('No control parameter exists');
+        break;
+    end
+    end
     if m == 1
         for j = 1:5
             for k = 1:length(threshrange)
@@ -113,7 +144,7 @@ else
             end
         end
     end
-    
+  if threshcheck==1  
     for n = 1:length(threshrange)
         clear IEIpkdet IEIpksto pkd pks
         IEIpkdet = cell(length(Xdet),length(Xdet{1}));IEIpksto = cell(length(Xdet),length(Xdet{1}));
@@ -153,11 +184,13 @@ else
             disp(['n = ' num2str(n) '/' num2str(length(threshrange))]);
         end
     end
+  end
     if exist('t') == 0
         Fs=50;
     else
         Fs = 1/t(2);
     end
+    
     L = length(Xsto{1}{1});
     NFFT = (2^2)*2^nextpow2(L);
     nw=10;
@@ -172,6 +205,7 @@ else
     winpeaknorm = sqrt(max(Xsinepsd).*(2.*Fs.*XsegL.*(sum(abs(winfunc).^2)./XsegL)))./XsegL;
     for j = 1:length(Xsto)
         for k = 1:length(Xsto{1})
+            if fftpkcheck==1
             clear fftpkspkheight fftpkdpkheight
             [Xstofft, fstofft, XstofftCI]= pwelch(Xsto{j}{k},winfunc,noverlap,NPSD,Fs,'ConfidenceLevel',0.999);
             [Xdetfft, fdetfft, XdetfftCI]= pwelch(Xdet{j}{k},winfunc,noverlap,NPSD,Fs,'ConfidenceLevel',0.999);
@@ -245,17 +279,36 @@ else
                 fftmaxpkwidthtdetR(m,j,k) = 0;
                 Qdet(m,j,k) = 0;
             end  
+            end
+            if k == 1
+                disp('Dip test...');
+                disp([num2str(j) '/' num2str(length(Xsto))])
+            end
             % Find the dip statistic and associated p-value
             Nboot = 10^1;   % number of bootstraps
+            %[as bs] = hist(Xsto{j}{k},freedmandiaconis(Xsto{j}{k}));as=as./sum(as);
+            %[ad bd] = hist(Xsto{j}{k},freedmandiaconis(Xdet{j}{k}));ad=ad./sum(ad);
             [dipsto(m,j,k), punisto(m,j,k), Xlowsto(m,j,k), Xupsto(m,j,k)]=HartigansDipSignifTest(Xsto{j}{k},Nboot);
             [dipdet(m,j,k), punidet(m,j,k), Xlowdet(m,j,k), Xupdet(m,j,k)]=HartigansDipSignifTest(Xdet{j}{k},Nboot);
+            if threshcheck ~= 1
+                if mod(k,25)==0
+                    disp([num2str(k) '/' num2str(length(Xsto{1}))])
+                end
+            end
            
         end
     end
+    if threshcheck==1 && fftpkcheck==1
 disp(['m = ' num2str(m) '/5']);
 disp(['Saving' num2str(m) '...']);
-save([directory 'output' num2str(m) '.mat'],'Qsto','Qdet','VSdet','VSsto','CDdetpk','CDstopk','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft');
-disp('Finished.');
+if biftype == 4
+    save([directory 'stiffind-' num2str(stiffind) '-output' num2str(m) '.mat'],'Qsto','Qdet','VSdet','VSsto','CDdetpk','CDstopk','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft','mu','threshrange','dipsto','dipdet');
+    disp('Finished.');
+else
+    save([directory 'output' num2str(m) '.mat'],'Qsto','Qdet','VSdet','VSsto','CDdetpk','CDstopk','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft','mu','threshrange','dipsto','dipdet');
+    disp('Finished.');
+end
+    end
 end
 
 %Pre-allocate memory
@@ -264,7 +317,8 @@ CD1d = zeros(length(threshrange),length(Xdet));CD1s = zeros(length(threshrange),
 sizeC1 = size(CDdetpk);
 sizeC2 = size(CDdetpk{1,1});
 
-for n = 1:sizeC1(1)
+if threshcheck ==1 && fftpkcheck ==1
+for n = 1:sizeC1(2)
     for j = 1:sizeC2(1)
         for k = 1:sizeC2(2)
             CDdetmean{n}(j,k) = mean([CDdetpk{1,n}(j,k) CDdetpk{2,n}(j,k) CDdetpk{3,n}(j,k) CDdetpk{4,n}(j,k) CDdetpk{5,n}(j,k)]);
@@ -280,13 +334,41 @@ for n = 1:sizeC1(1)
             VSdetsem(j,k) = std([VSdet(1,j,k) VSdet(2,j,k) VSdet(3,j,k) VSdet(4,j,k) VSdet(5,j,k)])/sqrt(5);
             VSstosem(j,k) = std([VSsto(1,j,k) VSsto(2,j,k) VSsto(3,j,k) VSsto(4,j,k) VSsto(5,j,k)])/sqrt(5);
         end
-        CD1d1 = findnearest(CDdetmean{n}(j,:),1);CD1d(n,j)=CDdetmean(CD1d1(1));
+        CD1d1 = findnearest(CDdetmean{n}(j,:),1);if isempty(CD1d1)==0;CD1d(n,j)=CDdetmean{n}(j,CD1d1(1));else CD1d(n,j)=NaN;end
         mu1d(n,j) = mu(CD1d1(1));       % control parameter at which CD ~ 1 (deterministic)
-        CD1s1 = findnearest(CDstomean{n}(j,:),1);CD1s(n,j)=CDstomean(CD1s1(1));
+        CD1s1 = findnearest(CDstomean{n}(j,:),1);if isempty(CD1s1)==0;CD1s(n,j)=CDstomean{n}(j,CD1s1(1));else CD1s(n,j)=NaN;end
         mu1s(n,j) = mu(CD1s1(1));       % control parameter at which CD ~ 1 (stochastic)
     end
 end
-
-disp('Saving...');
-save([directory 'outputALL.mat'],'Qsto','Qdet','VSdet','VSsto','mu1s','mu1d','CDdetmean','CDdetsem','CDstomean','CDstosem','Qstomean','Qstosem','Qdetmean','Qdetsem','VSdetmean','VSdetsem','VSstomean','VSstosem','dipsto','dipdet','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft');
-disp('Finished.');
+end
+if threshcheck==1 && fftpkcheck ==1
+if biftype == 4
+    disp('Saving...');
+    save([directory 'outputALL-stiffind-' num2str(stiffind) '.mat'],'Qsto','Qdet','VSdet','VSsto','mu1s','mu1d','CDdetmean','CDdetsem','CDstomean','CDstosem','Qstomean','Qstosem','Qdetmean','Qdetsem','VSdetmean','VSdetsem','VSstomean','VSstosem','dipsto','dipdet','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft','mu','threshrange','CDdetpk','CDstopk','CD1d','CD1s');
+    disp('Finished.');
+else
+    disp('Saving...');
+    save([directory 'outputALL.mat'],'Qsto','Qdet','VSdet','VSsto','mu1s','mu1d','CDdetmean','CDdetsem','CDstomean','CDstosem','Qstomean','Qstosem','Qdetmean','Qdetsem','VSdetmean','VSdetsem','VSstomean','VSstosem','dipsto','dipdet','punisto','punidet','fftmaxpkheightdet','fftmaxpkheightsto','fftmaxpkfreqtdet','fftmaxpkfreqtsto','fstofft','mu','threshrange','CDdetpk','CDstopk','CD1d','CD1s');
+    disp('Finished.');
+end
+elseif threshcheck==1 && fftpkcheck ==0
+    if biftype == 4
+    disp('Saving...');
+    save([directory 'output-NOTHRESHCHECK-stiffind-' num2str(stiffind) '.mat'],'VSdet','VSsto','mu1s','mu1d','VSdetmean','VSdetsem','VSstomean','VSstosem','dipsto','dipdet','punisto','punidet','mu','threshrange');
+    disp('Finished.');
+else
+    disp('Saving...');
+    save([directory 'output-NOTHRESHCHECK.mat'],'VSdet','VSsto','mu1s','mu1d','VSdetmean','VSdetsem','VSstomean','VSstosem','dipsto','dipdet','punisto','punidet','mu','threshrange');
+    disp('Finished.');
+    end
+else
+    if biftype == 4
+    disp('Saving...');
+    save([directory 'output-NOTHRESHCHECK-stiffind-' num2str(stiffind) '.mat'],'dipsto','dipdet','punisto','punidet','mu','threshrange');
+    disp('Finished.');
+else
+    disp('Saving...');
+    save([directory 'output-NOTHRESHCHECK.mat'],'dipsto','dipdet','punisto','punidet','mu','threshrange');
+    disp('Finished.');
+    end
+end
