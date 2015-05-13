@@ -63,7 +63,7 @@ title('Hair Bundle Data');
 
 %{
 ft=fittype('a*x^b+c');
-[fitdet gofdet] = fit(I(find(I>0))',pkspikeratedet(1,find(I>0))',ft);
+[fitdet gofdet] = fit(I(find(I>0))',(1,find(I>0))',ft);
 plot(fitdet,'k');
 for j = 1:maxiter
     [fitsto{j} gofsto{j}] = fit(I(I>0)',pkspikeratestoAVG(j,I>0)',ft);
@@ -85,20 +85,20 @@ plot(I,1./sqrt(IEImeanpkdet),'k--')
 plot(I,ones(1,length(I)),'g--');
 legend('Data','1/sqrt(mean','CV=1');
 axis([mu(1) mu(end) 0.1 1000]);
-xlabel('Control Parameter');ylabel('Coefficient of Variation - peak/peak');
+xlabel('Control Parameter');ylabel('Coefficient of Dispersion - peak/peak');
 title('Bundle Data - Between Peaks');
 
 % PLOT THE COEFFICIENT OF DISPERSION FOR PEAK/PEAK and TROUGH/TROUGH
 hrt(2)=figure(2);
 subplot(2,1,2);
-ha=plot(I,CDdetpk(1,:),'k');
+ha=plot(I,CDdettr(1,:),'k');
 hb = get(ha,'children'); 
 set(get(ha,'Parent'),'YScale','log');
 set(gca,'xdir','reverse'); hold on;
 plot(I,ones(1,length(I)),'g--');
 legend('Data','CD=1');
 axis([mu(1) mu(end) 0.1 1000]);
-xlabel('Control Parameter');ylabel('Coefficient of Dispersion - peak/peak');
+xlabel('Control Parameter');ylabel('Coefficient of Dispersion - trough/trough');
 title('Bundle Data - Between Peaks');
 
 % PLOT THE COEFFICIENT OF DISPERSION FOR EACH PEAK
@@ -229,7 +229,7 @@ for k = 1:sum((Iselect(j,:)~=0))
     %xlabel('Time');ylabel('Position');
     title(sprintf('%s %s%s','Bundle Data','mu = ',num2str((Iselect2(j,k)))));
     spp = get(sph, 'pos');
-    set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+    axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
     xdr=real(hilbert(Xscale2(k+(j-1)*5).*Xd_dwnspl{Iselect(j,k)}));xdi=imag(hilbert(Xscale2(k+(j-1)*5).*Xd_dwnspl{Iselect(j,k)}));
     if length(unique(xdr)) > 1 && length(unique(xdi)) > 1
         sph=subplot(8,length(Iselect(1,:)),k+3*length(Iselect(1,:)));[bw dens mx my]=kde2d([xdr,xdi],2^8,[ymin,ymin],[ymax,ymax]);
@@ -248,40 +248,40 @@ for k = 1:sum((Iselect(j,:)~=0))
         sph=subplot(8,length(Iselect(1,:)),k+length(Iselect(1,:)));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'k');axis([mx(1,1) mx(1,end) my(1,1) my(end,1)]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         sph=subplot(8,length(Iselect(1,:)),k+2*length(Iselect(1,:)));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'k');axis([mx(1,1) mx(1,end) my(1,1) my(end,1)]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         sph=subplot(8,length(Iselect(1,:)),k+3*length(Iselect(1,:)));pcolor(mx(1,:)',my(:,1)',dens);shading interp;load jetnew.mat;colormap(cjetnew);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         [bw1,dens1,xmesh]=kde1d(xdr);dens1=dens1./sum(dens1);
         sph=subplot(8,length(Iselect(1,:)),k+4*length(Iselect(1,:)));plot(xmesh,dens1,'k');axis([mx(1,1) mx(1,end) 0 1.1*max(dens1)]);
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);Xdpos=Xd_dwnspl{Iselect(j,k)}(tmin:dwnspl2:tmax);Xdvel=gradient(Xd_dwnspl{Iselect(j,k)}(tmin:dwnspl2:tmax));[bw dens mxn myn]=kde2d([Xdpos,Xdvel],2^8,[ymin,ymin],[ymax,ymax]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);Xdpos=Xd_dwnspl{Iselect(j,k)}(tmin:dwnspl2:tmax);Xdvel=gradient(Xd_dwnspl{Iselect(j,k)}(tmin:dwnspl2:tmax));[bw dens mxn myn]=kde2d([Xdpos,Xdvel],2^8,[ymin,ymin],[ymax,ymax]);
         sph=subplot(8,length(Iselect(1,:)),k+5*length(Iselect(1,:)));plot(Xdpos,Xdvel);axis([mxn(1,1) mxn(1,end) myn(1,1) myn(end,1)]);
         %tt=findnearest(fdetfft{j,Iselect(j,k)},fftfreqdet(1,Iselect(j,k)));tt=tt(1);hold on;scatter(fdetfft{j,Iselect(j,k)}(tt),Xscale2(k+(j-1)*5).*Xd_dwnsplfft{1,Iselect(j,k)}(tt),'b.');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         sph=subplot(8,length(Iselect(1,:)),k+6*length(Iselect(1,:)));pcolor(mx(1,:)',my(:,1)',dens);shading interp;load jetnew.mat;colormap(cjetnew);
         %tt=findnearest(fdetfft{j,Iselect(j,k)},fftfreqdet(1,Iselect(j,k)));tt=tt(1);hold on;scatter(fdetfft{j,Iselect(j,k)}(tt),Xscale2(k+(j-1)*5).*Xd_dwnsplfft{1,Iselect(j,k)}(tt),'b.');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         sph=subplot(8,length(Iselect(1,:)),k+7*length(Iselect(1,:)));plot(fdetfft{Iselect(j,k)},Xscale2(k+(j-1)*5).*Xd_dwnsplfft{Iselect(j,k)},'k');axis([fmin fmax 0 2*max(Xd_dwnsplfft{Iselect(j,k)})]);
         %tt=findnearest(fdetfft{j,Iselect(j,k)},fftfreqdet(1,Iselect(j,k)));tt=tt(1);hold on;scatter(fdetfft{j,Iselect(j,k)}(tt),Xscale2(k+(j-1)*5).*Xd_dwnsplfft{1,Iselect(j,k)}(tt),'b.');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
     else
         sph=subplot(8,length(Iselect(1,:)),k+length(Iselect(1,:)));plot(xdr(realimagstart:dwnsplrealimag:realimagend),xdi(realimagstart:dwnsplrealimag:realimagend),'k');axis([yimin yimax yimin yimax]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
         sph=subplot(8,length(Iselect(1,:)),k+2*length(Iselect(1,:)));quiver(xdr(quiverstart:dwnsplquiver:quiverend),xdi(quiverstart:dwnsplquiver:quiverend),gradient(xdr(quiverstart:dwnsplquiver:quiverend)),gradient(xdi(quiverstart:dwnsplquiver:quiverend)),quiverscale,'k');axis([yimin yimax yimin yimax]);
         %xlabel('Real');ylabel('Imaginary');
         spp = get(sph, 'pos');
-        set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
+        axis off;set(sph, 'Position', [spp(1) 1*spp(2) 1.3*spp(3) 1.4*spp(4)]);
     end
 end
 end
