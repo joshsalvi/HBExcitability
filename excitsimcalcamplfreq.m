@@ -9,10 +9,11 @@ function excitsimcalcamplfreq(filename1,biftype,stiffind)
 % stiffind : stiffness/force index for biftype==4
 %
 % jsalvi@rockefeller.edu
+stiffind2=stiffind;
 load(filename1)
-
+stiffind=stiffind2;
 if biftype == 1 || biftype == 2 || biftype == 3 || biftype == 5
-    stiffind=1;
+    %stiffind=1;
 elseif biftype == 4
         Xsto1=Xsto; Xdet1=Xdet; pksto1=pksto;pkdet1=pkdet;trsto1=trsto;trdet1=trdet;clear Xdet Xsto pkdet pksto trdet trsto;
 for j = 1:length(Xdet1)       % Isolate the appropriate index

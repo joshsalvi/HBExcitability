@@ -1,4 +1,4 @@
-function excitanalysissupplsim(directory,biftype,threshrange,threshcheck,fftpkcheck)
+function excitanalysissupplsim(directory,biftype,threshrange,threshcheck,fftpkcheck,stiffind)
 %
 % Finds additional metrics on simulated data from bifurcation normal forms.
 %
@@ -44,11 +44,11 @@ else
         files{j} = dir([directory '*-all-pt' num2str(j) '.mat']);
     end
 end
-
+%{
 if biftype == 4
     stiffind = input('Which index in stiffness? (1,2,3,4,5)...   ');
 end
-
+%}
 
 
 

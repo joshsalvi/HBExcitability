@@ -56,8 +56,10 @@ elseif biftype == 4
     sizeX = size(Xdet1);
 for j = 1:sizeX(1)       % Isolate the appropriate index
     for m = 1:sizeX(3)
-        Xsto{m}{j} = Xsto1{j,stiffind,m}(1,1:dwnspl:end) + offset;
-        Xdet{m}{j} = Xdet1{j,stiffind,m}(1,1:dwnspl:end) + offset;
+        for k = 1:sizeX(2)
+            Xsto{j}{k}{m} = Xsto1{j,k,m}(1,1:dwnspl:end) + offset;
+            Xdet{j}{k}{m} = Xdet1{j,k,m}(1,1:dwnspl:end) + offset;
+        end
     end
 end
 elseif biftype == 5
@@ -204,6 +206,8 @@ else
     
 
 % Define time vector
+t=linspace(0,1e6,5e6); % SEE "partitiondata"
+t=t(1:length(Xdet{1}{1}{1}));
 tvec=t(1:dwnspl:end);
 if dwnspl>1
 tvec=tvec(1:length(Xdet{1}{1}{1}));
@@ -330,10 +334,11 @@ end
 end
 
 end
+stiffind=1;
 if saveyn == 1
     disp('Saving...');
     filename2 = filename(1:end-4);
-    save(sprintf('%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12thresh),'-biftype',num2str(biftype),'.mat'),'-v7.3')
+    save(sprintf('%s%s%s%s%s%s%s%s%s%s',filename2,'-dwnspl',num2str(dwnspl),'-thresh',num2str(c12thresh),'-biftype',num2str(biftype),'-stiffind',num2str(stiffind),'.mat'),'-v7.3')
     disp('Finished.');
 else
     disp('Not saved.');
