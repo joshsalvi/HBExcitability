@@ -50,10 +50,11 @@ if biftype == 4
 end
 %}
 
-
+stiffind2=stiffind;
 
 for m = 1:5
     load([directory files{m}.name]);
+    stiffind=stiffind2;
     if m == 1
         % Pre-allocate memory
         dipsto = zeros(5,length(Xdet),length(Xdet{1}));dipdet = zeros(5,length(Xdet),length(Xdet{1}));
