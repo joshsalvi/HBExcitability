@@ -147,26 +147,26 @@ else
     end
   if threshcheck==1  
     for n = 1:length(threshrange)
-        clear trtimedet trtime pkd pks
-        trtimedet = cell(length(Xdet),length(Xdet{1}));trtime = cell(length(Xdet),length(Xdet{1}));
+        clear IEIpkdet IEIpksto pkd pks
+        IEIpkdet = cell(length(Xdet),length(Xdet{1}));IEIpksto = cell(length(Xdet),length(Xdet{1}));
         for j = 1:length(Xdet)
             for k = 1:length(Xdet{1})
                 % Peak finding and CV
                 pkd{j,k} = PTDetect(Xdet{j}{k},threshrange(n));
                 pks{j,k} = PTDetect(Xsto{j}{k},threshrange(n));
                 for l = 2:length(pkd{j,k})
-                    trtimedet{j,k}(l-1) = (pkd{j,k}(l) - pkd{j,k}(l-1));
+                    IEIpkdet{j,k}(l-1) = (pkd{j,k}(l) - pkd{j,k}(l-1));
                 end
                 for l = 2:length(pks{j,k})
-                    trtime{j,k}(l-1) = (pks{j,k}(l) - pks{j,k}(l-1));
+                    IEIpksto{j,k}(l-1) = (pks{j,k}(l) - pks{j,k}(l-1));
                 end
-                if isempty(trtimedet{j,k})==0
-                    CVdetpk{m,n}(j,k) = std(trtimedet{j,k})/mean(trtimedet{j,k});
+                if isempty(IEIpkdet{j,k})==0
+                    CVdetpk{m,n}(j,k) = std(IEIpkdet{j,k})/mean(IEIpkdet{j,k});
                 else
                     CVdetpk{m,n}(j,k) = 0;
                 end
-                if isempty(trtime{j,k})==0
-                    CVstopk{m,n}(j,k) = var(trtime{j,k})/mean(trtime{j,k});
+                if isempty(IEIpksto{j,k})==0
+                    CVstopk{m,n}(j,k) = var(IEIpksto{j,k})/mean(IEIpksto{j,k});
                 else
                     CVstopk{m,n}(j,k) = 0;
                 end
