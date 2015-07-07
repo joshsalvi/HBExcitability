@@ -1,6 +1,6 @@
-biftype =2;
+biftype =4;
 forcestiff=1;
-hbcalc=1;
+hbcalc=0;
 
 % Plot excitability data (and perform statistics)
 % plotexcitabilitydata2(biftypemforcestiff)
