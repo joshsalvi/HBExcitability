@@ -51,7 +51,7 @@ while Fdiff > dF
     
     clear Xsto X pk tr
     
-    [~, Xsto] = hbtoymodel(Fc,kc,noiselevel,0,0,tvec);      % generate simulation data
+    [~, Xsto] = hbtoymodel(Fc,kc,noiselevel,0,[0 0],tvec);      % generate simulation data
     X = Xsto(1,round(size(Xsto,2)/2):end);                  % extract last 50% of signal
     [pk tr] = PTDetect(X,thresh);                           % find peaks and troughs
     
@@ -75,11 +75,11 @@ end
 clear X Xsto pk tr
 
 % Check which time series possess a spike
-[~, Xsto] = hbtoymodel(Fc,kc,noiselevel,0,0,tvec);          % Force 1
+[~, Xsto] = hbtoymodel(Fc,kc,noiselevel,0,[0 0],tvec);          % Force 1
 X1 = Xsto(1,round(size(Xsto,2)/2):end);
 [pk1 tr1] = PTDetect(X1,thresh);
 
-[~, Xsto] = hbtoymodel(Fc_old,kc,noiselevel,0,0,tvec);      % Force 2
+[~, Xsto] = hbtoymodel(Fc_old,kc,noiselevel,0,[0 0],tvec);      % Force 2
 X2 = Xsto(1,round(size(Xsto,2)/2):end);
 [pk2 tr2] = PTDetect(X2,thresh);
 
@@ -92,7 +92,7 @@ elseif (isempty(pk1) == 1 || isempty(tr1) == 1) && (isempty(pk2) == 0 || isempty
     numspk = max([length(tr2) length(pk2)]);
     X = X2;
 elseif (isempty(pk1) == 0 || isempty(tr1) == 0) && (isempty(pk2) == 0 || isempty(tr2) == 0)
-    [~, Xsto] = hbtoymodel(Fmax_old,kc,noiselevel,0,0,tvec);      % Force 2
+    [~, Xsto] = hbtoymodel(Fmax_old,kc,noiselevel,0,[0 0],tvec);      % Force 2
     X2 = Xsto(1,round(size(Xsto,2)/2):end);
     [pk2 tr2] = PTDetect(X2,thresh);
     if isempty(pk2) == 0 || isempty(tr2) == 0
@@ -101,13 +101,13 @@ elseif (isempty(pk1) == 0 || isempty(tr1) == 0) && (isempty(pk2) == 0 || isempty
         X = X2;
     else
         Fspk = (Fc + Fc_old) / 2;
-        [~, Xsto] = hbtoymodel(Fspk,kc,noiselevel,0,0,tvec);
+        [~, Xsto] = hbtoymodel(Fspk,kc,noiselevel,0,[0 0],tvec);
         X = Xsto(1,round(size(Xsto,2)/2):end);
         [pk2 tr2] = PTDetect(X2,thresh);
         numspk = max([length(tr2) length(pk2)]);
     end
 elseif (isempty(pk1) == 1 || isempty(tr1) == 1) && (isempty(pk2) == 1 || isempty(tr2) == 1)
-    [~, Xsto] = hbtoymodel(Fmin_old,kc,noiselevel,0,0,tvec);      % Force 2
+    [~, Xsto] = hbtoymodel(Fmin_old,kc,noiselevel,0,[0 0],tvec);      % Force 2
     X2 = Xsto(1,round(size(Xsto,2)/2):end);
     [pk2 tr2] = PTDetect(X2,thresh);
     if isempty(pk2) == 0 || isempty(tr2) == 0
