@@ -1,11 +1,11 @@
-j=1;
-h = gca; %current figure handle
+j=2;
+h = gcf; %current figure handle
 axesObjs = get(h, 'Children');  %axes handles
 dataObjs = get(axesObjs, 'Children'); %handles to low-level graphics objects in axes
 objTypes = get(dataObjs{j}, 'Type');  %type of low-level graphics object
 xdata = get(dataObjs{j}, 'XData');  %data from low-level grahics objects
 ydata = get(dataObjs{j}, 'YData');
-%zdata = get(dataObjs{j}, 'ZData');
+udata = get(dataObjs{j}, 'uData');
 
 %%
 
@@ -200,12 +200,13 @@ for j = 1:sizeI(1)
             pkspikeratedetSEM(j,k) = std(a2);
         end
     end
+    disp(num2str(j));
 end
-CDpkdetSEM = reshape(CDpkdetSEM,1,size(CDpkdetSEM,1)*size(CDpkdetSEM,2));   
-pkspikeratedetSEM = reshape(pkspikeratedetSEM,1,size(pkspikeratedetSEM,1)*size(pkspikeratedetSEM,2)); 
-L2 = length(CDpkdetSEM);L3 = length(pkspikeratedetSEM);scaling=ydata{m}(1)./(var(IEIpkdet{1,1})/mean(IEIpkdet{1,1}));
-CDpkdetSEM(L2+1:length(ydata{1}))=0;
-pkspikeratedetSEM(L3+1:length(ydata{1}))=0;
+%CDpkdetSEM = reshape(CDpkdetSEM,1,size(CDpkdetSEM,1)*size(CDpkdetSEM,2));   
+%pkspikeratedetSEM = reshape(pkspikeratedetSEM,1,size(pkspikeratedetSEM,1)*size(pkspikeratedetSEM,2)); 
+%L2 = length(CDpkdetSEM);L3 = length(pkspikeratedetSEM);scaling=ydata{m}(1)./(var(IEIpkdet{1,1})/mean(IEIpkdet{1,1}));
+%CDpkdetSEM(L2+1:length(ydata{1}))=0;
+%pkspikeratedetSEM(L3+1:length(ydata{1}))=0;
 
 %% Bootstrap the dip statistic
 clc;
@@ -243,3 +244,50 @@ figure;errorbar(xdata{m},ydata{m},pkspikeratedetSEM,pkspikeratedetSEM-pkspikerat
 elseif mm==1
     figure;errorbar(xdata{m},ydata{m},pkspikeratedetSEM-pkspikeratedetSEM,pkspikeratedetSEM)
 end
+
+%% bootstrap the coefficient of variation
+files{1} = '/Volumes/Promise Pegasus/Manual Backup/Lab/Clamp Data/2013-04-19.01/Ear 1/Cell 8/Extracted Data2.matDwnspl20-Thresh6-output.mat';
+files{2} = '/Volumes/Promise Pegasus/Manual Backup/Lab/Clamp Data/2013-04-19.01/Ear 1/Cell 8/Extracted Data2.matDwnspl20-Thresh8-output.mat';
+files{3} = '/Volumes/Promise Pegasus/Manual Backup/Lab/Clamp Data/2013-04-19.01/Ear 1/Cell 8/Extracted Data2.matDwnspl20-Thresh10-output.mat';
+
+Nboot = 1e3;
+
+for qr = 1:length(files)
+    disp('loading')
+    load(files{qr});
+for j = 1:size(pktimedet,1)
+    for k = 1:size(pktimedet,2)
+        disp(num2str(k));
+        xpk = pktimedet{j,k};
+        xtr = trtimedet{j,k};
+        if length(xpk) >1;
+        cvpktimedet{qr}(j,k) = std(xpk)/mean(xpk);
+        else
+             cvpktimedet{qr}(j,k) = NaN;
+        end
+        if length(xtr) >1
+        cvtrtimedet{qr}(j,k) = std(xtr)/mean(xtr);
+        else
+            cvtrtimedet{qr}(j,k) = NaN;
+        end
+        mpk{qr}(j,k) = isnan(cvpktimedet{qr}(j,k));
+        mtr{qr}(j,k) = isnan(cvtrtimedet{qr}(j,k));
+        if isnan(cvpktimedet{qr}(j,k)) ==0
+        [apk] = bootstrp(Nboot,@(x) std(x)/mean(x),xpk);
+        
+        cvpktimedetSEM{qr}(j,k) = std(apk(isnan(apk)==0));
+        
+        else
+        cvpktimedetSEM{qr}(j,k) = NaN;
+        
+        end
+        if isnan(cvtrtimedet{qr}(j,k)) ==0 
+            [atr] = bootstrp(Nboot,@(x) std(x)/mean(x),xtr);
+            cvtrtimedetSEM{qr}(j,k) = std(atr(isnan(atr)==0));
+        else
+            cvtrtimedetSEM{qr}(j,k) = NaN;
+        end
+    end
+end
+end
+

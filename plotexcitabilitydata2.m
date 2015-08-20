@@ -1,4 +1,4 @@
-function plotexcitabilitydata2(biftype,forcestiff)
+% plotexcitabilitydata2(biftype,forcestiff)
 % Plot excitability data (and perform statistics)
 % plotexcitabilitydata2(biftypemforcestiff)
 % biftype: 1=supercritical Hopf, 2=SNIC, 3=subcritical Hopf, 4=Cusp/Fold ,5=HB model
@@ -2023,7 +2023,11 @@ for k = 1:length(Iselect);
 end
 end
 
+
 elseif biftype ==5
+    
+    hbcalc=1;
+    
     if hbcalc==1
 % HAIR BUNDLE MODEL - GENERATE AVERAGES
 
@@ -2594,5 +2598,5 @@ end
     end
 end
 
-end
+
 

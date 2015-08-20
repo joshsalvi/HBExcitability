@@ -1,4 +1,4 @@
-function [pkspikeratedet, pkspikeratesto, CDdetpk, CDstopk] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
+function [pkspikeratedet, pkspikeratesto, CDstopk, meanIEIpksto, IEIvarpksto,IEImeanpksto] = excitabilityanalysissim2(filename,dwnspl,biftype,c12thresh,offset,saveyn)
 % This function imports simulation data and performs a peak-finding algorithm
 % analysis. 
 %
@@ -52,16 +52,16 @@ elseif biftype == 3
     end
     clear Xdet1 Xsto1
 elseif biftype == 4
-    Xsto1=Xsto; Xdet1=Xdet;clear Xdet Xsto;
+ %   Xsto1=Xsto; Xdet1=Xdet;clear Xdet Xsto;
     sizeX = size(Xdet1);
-for j = 1:sizeX(1)       % Isolate the appropriate index
-    for m = 1:sizeX(3)
-        for k = 1:sizeX(2)
-            Xsto{j}{k}{m} = Xsto1{j,k,m}(1,1:dwnspl:end) + offset;
-            Xdet{j}{k}{m} = Xdet1{j,k,m}(1,1:dwnspl:end) + offset;
-        end
-    end
-end
+%for j = 1:sizeX(1)       % Isolate the appropriate index
+%    for m = 1:sizeX(3)
+ %       for k = 1:sizeX(2)
+            %Xsto{j}{k}{m} = Xsto1{j,k,m}(1,1:dwnspl:end) + offset;
+            %Xdet{j}{k}{m} = Xdet1{j,k,m}(1,1:dwnspl:end) + offset;
+%        end
+%    end
+%end
 elseif biftype == 5
     Xsto1=Xsto;Xdet1=Xdet;
     clear Xdet Xsto
@@ -72,7 +72,6 @@ elseif biftype == 5
             Xdet{k}{j} = Xdet1{j,k}(1,1:dwnspl:end) + offset;
         end
     end
-    
 else
     disp('No bifurcation type chosen');
 end
